@@ -1,0 +1,37 @@
+<towers>
+	<tower
+		name="Arrow Tower"
+		damage="2"
+		range="12"
+		fire_rate="0.25"
+		cost="10"
+		img="tower_images/arrow_tower.png" />
+		
+	<tower
+		name="Cannon"
+		damage="5"
+		range="10"
+		fire_rate="1"
+		cost="20"
+		img="tower_images/cannon.png">
+		<upgrade
+			name="More damage"
+			descrip="Damage increased slightly"
+			cost="5" 
+			damage_upgrade="2"/>
+	</tower>
+		
+	<tower
+		name="Rocket"
+		damage="30"
+		range="20"
+		fire_rate="2.5"
+		cost="50"
+		img="tower_images/rocket.png">
+		<upgrade
+			name="Extra Range"
+			descrip="Same fire rate, but double the range"
+			cost="75" 
+			range_upgrade="20"/>
+	</tower>
+</towers>
