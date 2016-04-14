@@ -10,6 +10,11 @@ void TileMap::setTile(int x, int y, Tile tile) {
 	return;
 }
 
+void TileMap::setTexture(sf::Texture texture) {
+    texture_ = texture;
+    return;
+}
+
 int TileMap::getTileSize() {
 	return tileSize_;
 }
@@ -21,6 +26,16 @@ void TileMap::setTileSize(int tileSize) {
 
 int TileMap::getXDimen() {
 	return xDimen_;
+}
+
+void TileMap::setXDimen(int xDimen) {
+    xDimen_ = xDimen;
+    return;
+}
+
+void TileMap::setYDimen(int yDimen) {
+    yDimen_ = yDimen;
+    return;
 }
 
 int TileMap::getYDimen() {

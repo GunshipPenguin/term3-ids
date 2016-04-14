@@ -4,20 +4,21 @@
 
 class TileMap {
 public:
-	TileMap(int tileSize, int xDimen, int yDimen, const char* mapFileName) 
-		: tileSize_(tileSize), xDimen_(xDimen), yDimen_(yDimen), mapFileName_(mapFileName) {}
-		
 	void setTileSize(int);
 	int getTileSize();
 	void setTile(int, int, Tile);
 	Tile getTile(int, int);
+	void setTexture(sf::Texture);
+	void setXDimen(int);
+	void setYDimen(int);
 	int getXDimen();
 	int getYDimen();
-		
+
 private:
 	int tileSize_;
 	std::vector<std::vector<Tile> > tiles_;
 	int xDimen_;
 	int yDimen_;
+	sf::Texture texture_;
 	const char* mapFileName_;
 };
