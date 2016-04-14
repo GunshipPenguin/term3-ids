@@ -23,15 +23,13 @@ void GameScreen::loadTileMap() {
     int tileSize;
     tileSetElement->QueryIntAttribute("size", &tileSize);
 
-    TileMap tileMap;
-
-    tileMap.setXDimen(width);
-    tileMap.setYDimen(height);
-    tileMap.setTileSize(tileSize);
+    tileMap_.setXDimen(width);
+    tileMap_.setYDimen(height);
+    tileMap_.setTileSize(tileSize);
 
     sf::Texture texture;
     texture.loadFromFile(tileSetElement->Attribute("src"));
-    tileMap.setTexture(texture);
+    tileMap_.setTexture(texture);
 
     return;
 }
