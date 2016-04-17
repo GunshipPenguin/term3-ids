@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "MenuScreen.h"
+#include "GameScreen.h"
 #include <iostream>
 
 int main()
@@ -12,9 +13,8 @@ int main()
     window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
-    MenuScreen menuScreen = MenuScreen();
+    GameScreen gameScreen;
+    gameScreen.run(window);
 
-    int menuExitStatus = menuScreen.run(window);
-    window.close();
     return 0;
 }

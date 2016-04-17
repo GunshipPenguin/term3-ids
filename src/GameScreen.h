@@ -5,10 +5,10 @@
 class GameScreen : public Screen {
 	public:
 		virtual int run(sf::RenderWindow&);
-        void setMapPath(const char*);
+        void setMapPath(std::string);
     private:
         void loadTileMap();
 
-        const char* mapPath_;
+        std::string mapPath_;
         TileMap tileMap_;
 };

@@ -1,11 +1,16 @@
 #include "Tile.h"
-	
+
+void Tile::setId(int id) {
+    id_ = id;
+    return;
+}
+
 void Tile::setCreepExit(bool creepExit) {
 	creepExit_ = creepExit;
 }
 
 void Tile::setCreepSpawn(bool spawn) {
-	spawn = spawn;
+	creepSpawn_ = spawn;
 }
 
 void Tile::setCreepWalkable(bool creepWalkable) {

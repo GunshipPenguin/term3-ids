@@ -2,9 +2,7 @@
 
 class Tile {
 public:
-	Tile(sf::Texture texture, bool buildable, bool creepWalkable)
-		: texture_(texture), buildable_(buildable), creepWalkable_(creepWalkable) {}
-
+    void setId(int);
 	void setCreepExit(bool);
 	void setCreepSpawn(bool);
 	void setCreepWalkable(bool);
@@ -19,6 +17,7 @@ public:
 	sf::Texture getTexture();
 
 private:
+    int id_;
 	sf::Texture texture_;
 	bool creepSpawn_;
 	bool creepExit_;
