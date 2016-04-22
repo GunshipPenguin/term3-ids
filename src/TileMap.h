@@ -16,7 +16,6 @@ public:
 	int getYDimen();
 	bool loadFromFile(std::string);
 
-
 private:
 	void parseTileData(const char*);
 

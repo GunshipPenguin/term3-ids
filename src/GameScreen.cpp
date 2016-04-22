@@ -4,8 +4,8 @@
 #include <iostream>
 
 int GameScreen::run(sf::RenderWindow &window) {
-    loadTileMap();
-    return 0;
+	loadTileMap();
+	return 0;
 }
 
 void GameScreen::loadTileMap() {
@@ -14,6 +14,6 @@ void GameScreen::loadTileMap() {
 }
 
 void GameScreen::setMapPath(std::string mapPath) {
-    mapPath_ = mapPath;
-    return;
+	mapPath_ = mapPath;
+	return;
 }
