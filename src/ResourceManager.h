@@ -1,5 +1,5 @@
-#ifndef SRC_RESOURCEMANAGER_H_
-#define SRC_RESOURCEMANAGER_H_
+#ifndef RESOURCEMANAGER_H
+#define RESOURCEMANAGER_H
 
 #include <string>
 
@@ -12,4 +12,4 @@ private:
 	static std::string binPath_;
 };
 
-#endif /* SRC_RESOURCEMANAGER_H_ */
+#endif

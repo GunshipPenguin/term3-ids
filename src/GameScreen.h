@@ -1,3 +1,6 @@
+#ifndef GAMESCREEN_H
+#define GAMESCREEN_H
+
 #include "Screen.h"
 #include "TileMap.h"
 #include <string>
@@ -12,3 +15,5 @@ private:
 	std::string mapPath_;
 	TileMap tileMap_;
 };
+
+#endif

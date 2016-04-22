@@ -1,3 +1,6 @@
+#ifndef TILEMAP_H
+#define TILEMAP_H
+
 #include <vector>
 #include <string>
 #include "Tile.h"
@@ -26,3 +29,5 @@ private:
 	sf::Texture texture_;
 	const char* mapFileName_;
 };
+
+#endif

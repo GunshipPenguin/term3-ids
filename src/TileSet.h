@@ -1,8 +1,8 @@
+#ifndef TILESET_H
+#define TILESET_H
+
 #include <SFML/Graphics.hpp>
 #include <string>
-
-#ifndef SRC_TILESET_H_
-#define SRC_TILESET_H_
 
 class TileSet {
 public:
@@ -16,4 +16,4 @@ private:
 	sf::Texture texture_;
 };
 
-#endif /* SRC_TILESET_H_ */
+#endif

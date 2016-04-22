@@ -1,3 +1,6 @@
+#ifndef TILE_H
+#define TILE_H
+
 #include <SFML/Graphics.hpp>
 
 class Tile {
@@ -25,3 +28,5 @@ private:
 	bool creepWalkable_;
 	bool built_;
 };
+
+#endif
