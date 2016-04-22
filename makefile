@@ -4,10 +4,10 @@ BIN_DIR = bin
 BIN_NAME = tower_def
 
 CC = g++
-CFLAGS = -Wall -c
-LFLAGS = -Wall -lsfml-graphics -lsfml-window -lsfml-system -ltinyxml2 -g
+CFLAGS = -Wall -c -g
+LFLAGS = -Wall -lsfml-graphics -lsfml-window -lsfml-system -ltinyxml2
 
-OBJS = main.o TileMap.o Tile.o MenuScreen.o GameScreen.o TileSet.o
+OBJS = main.o TileMap.o Tile.o MenuScreen.o GameScreen.o TileSet.o ResourceManager.o
 
 all: make_build_dir $(OBJS)
 	mkdir -p $(BIN_DIR)
@@ -30,6 +30,9 @@ GameScreen.o: $(SRC_DIR)/GameScreen.cpp
 
 TileSet.o: $(SRC_DIR)/TileSet.cpp
 	$(CC) $(CFLAGS) $(SRC_DIR)/TileSet.cpp -o $(BUILD_DIR)/TileSet.o
+	
+ResourceManager.o: $(SRC_DIR)/ResourceManager.cpp
+	$(CC) $(CFLAGS) $(SRC_DIR)/ResourceManager.cpp -o $(BUILD_DIR)/ResourceManager.o
 
 make_build_dir:
 	mkdir -p $(BUILD_DIR)
