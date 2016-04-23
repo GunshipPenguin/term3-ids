@@ -12,7 +12,6 @@ public:
 	int getTileSize();
 	void setTile(int, int, Tile);
 	Tile getTile(int, int);
-	void setTexture(sf::Texture);
 	void setXDimen(int);
 	void setYDimen(int);
 	int getXDimen();
@@ -20,13 +19,12 @@ public:
 	bool loadFromFile(std::string);
 
 private:
-	void parseTileData(const char*);
+	void parseTileData(std::string);
 
 	std::vector<Tile> tiles_;
 	TileSet tileSet_;
 	int xDimen_;
 	int yDimen_;
-	sf::Texture texture_;
 	const char* mapFileName_;
 };
 

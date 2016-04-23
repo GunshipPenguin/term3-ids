@@ -10,7 +10,7 @@ int TileSet::getTileSize() {
 	return tileSize_;
 }
 
-void TileSet::loadTextureFromFile(std::string path) {
-	texture_.loadFromFile(path);
+void TileSet::setTexture(sf::Texture texture) {
+	texture_ = texture;
 	return;
 }

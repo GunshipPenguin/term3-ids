@@ -6,6 +6,7 @@
 class Tile {
 public:
 	void setId(int);
+	int getId();
 	void setCreepExit(bool);
 	void setCreepSpawn(bool);
 	void setCreepWalkable(bool);

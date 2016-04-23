@@ -8,7 +8,7 @@ class TileSet {
 public:
 	void setTileSize(int);
 	int getTileSize();
-	void loadTextureFromFile(std::string);
+	void setTexture(sf::Texture);
 	sf::Texture getTileTexture(int);
 
 private:

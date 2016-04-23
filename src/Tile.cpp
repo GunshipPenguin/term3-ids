@@ -5,6 +5,10 @@ void Tile::setId(int id) {
 	return;
 }
 
+int Tile::getId() {
+	return id_;
+}
+
 void Tile::setCreepExit(bool creepExit) {
 	creepExit_ = creepExit;
 }

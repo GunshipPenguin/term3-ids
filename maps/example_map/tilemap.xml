@@ -3,8 +3,7 @@
 	width="25">
 
 	<tile_set
-		height="16"
-		width="16"
+		size="16"
 		creep_walkable="1,2,4"
 		buildable="6,8"
 		src="tiles.png" />
@@ -16,6 +15,6 @@
 		tile="43" />
 
 	<tile_data>
-		23,44,23,23,23,32
+		23,44
 	</tile_data>
 </tile_map>

@@ -7,7 +7,7 @@ CC = g++
 CFLAGS = -Wall -c -g
 LFLAGS = -Wall -lsfml-graphics -lsfml-window -lsfml-system -ltinyxml2
 
-OBJS = main.o TileMap.o Tile.o MenuScreen.o GameScreen.o TileSet.o ResourceManager.o
+OBJS = main.o TileMap.o Tile.o MenuScreen.o GameScreen.o TileSet.o ResourceManager.o Logger.o
 
 all: make_build_dir $(OBJS)
 	mkdir -p $(BIN_DIR)
@@ -33,6 +33,9 @@ TileSet.o: $(SRC_DIR)/TileSet.cpp
 	
 ResourceManager.o: $(SRC_DIR)/ResourceManager.cpp
 	$(CC) $(CFLAGS) $(SRC_DIR)/ResourceManager.cpp -o $(BUILD_DIR)/ResourceManager.o
+	
+Logger.o: $(SRC_DIR)/Logger.cpp
+	$(CC) $(CFLAGS) $(SRC_DIR)/Logger.cpp -o $(BUILD_DIR)/Logger.o
 
 make_build_dir:
 	mkdir -p $(BUILD_DIR)
