@@ -1,7 +1,21 @@
 #include "Tile.h"
+#include "Drawable.h"
+#include <SFML/Graphics.hpp>
+#include <iostream>
 
 void Tile::setId(int id) {
 	id_ = id;
+	return;
+}
+
+void Tile::draw(sf::RenderWindow &window, sf::Texture &tiles) {
+	sf::Sprite sprite = getSpriteById(id_, tiles, tileSize_);
+	sprite.setPosition(x_, y_);
+
+	float scale = drawnSize_ / sprite.getLocalBounds().width;
+	sprite.setScale(scale, scale);
+
+	window.draw(sprite);
 	return;
 }
 
@@ -29,10 +43,6 @@ void Tile::setBuildable(bool buildable) {
 	buildable_ = buildable;
 }
 
-void Tile::setTexture(sf::Texture texture) {
-	texture_ = texture;
-}
-
 bool Tile::isCreepExit() {
 	return creepExit_;
 }
@@ -51,8 +61,4 @@ bool Tile::isBuilt() {
 
 bool Tile::isBuildable() {
 	return buildable_;
-}
-
-sf::Texture Tile::getTexture() {
-	return texture_;
 }

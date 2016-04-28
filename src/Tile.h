@@ -2,8 +2,9 @@
 #define TILE_H
 
 #include <SFML/Graphics.hpp>
+#include "Drawable.h"
 
-class Tile {
+class Tile : public Drawable {
 public:
 	void setId(int);
 	int getId();
@@ -12,17 +13,16 @@ public:
 	void setCreepWalkable(bool);
 	void setBuilt(bool);
 	void setBuildable(bool);
-	void setTexture(sf::Texture);
+	void setSprite(sf::Sprite);
 	bool isCreepExit();
 	bool isCreepSpawn();
 	bool isCreepWalkable();
 	bool isBuildable();
 	bool isBuilt();
-	sf::Texture getTexture();
+	void draw(sf::RenderWindow&, sf::Texture &tiles);
 
 private:
 	int id_;
-	sf::Texture texture_;
 	bool creepSpawn_;
 	bool creepExit_;
 	bool buildable_;

@@ -7,7 +7,7 @@ CC = g++
 CFLAGS = -Wall -c -g
 LFLAGS = -Wall -lsfml-graphics -lsfml-window -lsfml-system -ltinyxml2
 
-OBJS = $(addprefix $(BUILD_DIR)/,main.o TileMap.o Tile.o MenuScreen.o GameScreen.o TileSet.o ResourceManager.o Logger.o)
+OBJS = $(addprefix $(BUILD_DIR)/,main.o Tile.o MenuScreen.o GameScreen.o ResourceManager.o Logger.o Drawable.o)
 
 all: binary
 
@@ -16,7 +16,7 @@ binary: make_build_dir $(OBJS)
 	$(CC) $(LFLAGS) $(BUILD_DIR)/*.o -o $(BIN_DIR)/$(BIN_NAME)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -o $@ $<
 
 make_build_dir:
 	mkdir -p $(BUILD_DIR)

@@ -3,6 +3,7 @@
 #include <string>
 #include "MenuScreen.h"
 #include "GameScreen.h"
+#include "Logger.h"
 #include "ResourceManager.h"
 #include <iostream>
 
@@ -16,8 +17,16 @@ int main(int argc, char* argv[]) {
 	window.setFramerateLimit(60);
 	window.setVerticalSyncEnabled(true);
 
+	if (argc != 2) {
+		Logger::log("Map path not specified");
+		return 1;
+	}
+
 	GameScreen gameScreen;
-	gameScreen.setMapPath("/home/rhys/Desktop/term3-ids/maps/example_map");
+	std::string mapPath(argv[1]);
+	std::cout << mapPath << std::endl;
+	gameScreen.setMapPath(mapPath);
+
 	gameScreen.run(window);
 
 	return 0;
