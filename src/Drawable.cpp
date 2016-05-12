@@ -20,6 +20,10 @@ void Drawable::setDrawnSize(int drawnTileSize) {
 	return;
 }
 
+int Drawable::getDrawnSize() {
+	return drawnSize_;
+}
+
 void Drawable::setPosition(int xPosition, int yPosition) {
 	x_ = xPosition;
 	y_ = yPosition;

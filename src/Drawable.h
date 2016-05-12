@@ -9,12 +9,15 @@ public:
 	void setTileSize(int tileSize);
 	void setPosition(int, int);
 	static void setDrawnSize(int);
+	static int getDrawnSize();
 
 protected:
 	sf::Sprite getSpriteById(int id, sf::Texture&, int tileSize);
 	int tileSize_;
 	int x_;
 	int y_;
+
+private:
 	static int drawnSize_;
 
 };
