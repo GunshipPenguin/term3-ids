@@ -229,12 +229,12 @@ bool GameScreen::loadTiles(std::string mapPath) {
 	return true;
 }
 
-std::vector<int> GameScreen::tokenizeIntString(std::string str, std::string delimetirs) {
+std::vector<int> GameScreen::tokenizeIntString(std::string str, std::string delimeters) {
 	std::string currToken;
 	int intToken;
 
-	std::string::size_type lastPos = str.find_first_not_of("\n,", 0);
-	std::string::size_type pos = str.find_first_of("\n,", lastPos);
+	std::string::size_type lastPos = str.find_first_not_of(delimeters, 0);
+	std::string::size_type pos = str.find_first_of(delimeters, lastPos);
 
 	std::vector<int> tokenVector;
 
@@ -243,8 +243,8 @@ std::vector<int> GameScreen::tokenizeIntString(std::string str, std::string deli
 		intToken = atoi(currToken.c_str());
 
 		// Skip delimiters
-		lastPos = str.find_first_not_of("\n,", pos);
-		pos = str.find_first_of("\n,", lastPos);
+		lastPos = str.find_first_not_of(delimeters, pos);
+		pos = str.find_first_of(delimeters, lastPos);
 
 		// Special case where currToken is the final tab
 		if (intToken == 0)
