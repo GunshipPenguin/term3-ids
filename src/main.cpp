@@ -8,14 +8,14 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-	int width = 300;
-	int height = 300;
+	int width = 160;
+	int height = 160;
 
 	ResourceManager::setBinPath(std::string(argv[0]));
 
 	sf::RenderWindow window(sf::VideoMode(width, height), "term3-ids");
-	window.setFramerateLimit(60);
-	window.setVerticalSyncEnabled(true);
+	window.setFramerateLimit(30);
+	//window.setVerticalSyncEnabled(true);
 
 	if (argc != 2) {
 		Logger::log("Map path not specified");

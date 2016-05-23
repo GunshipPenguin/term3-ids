@@ -4,8 +4,8 @@
 
 	<tile_set
 		size="16"
-		creep_walkable="12"
-		buildable="17"
+		creep_walkable="17"
+		buildable="12"
 		src="tiles.png" />
 
 	<creep_spawn

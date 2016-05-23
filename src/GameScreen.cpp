@@ -1,6 +1,8 @@
 #include "GameScreen.h"
 #include "Logger.h"
 #include "Tile.h"
+#include "Creep.h"
+#include "Path.h"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -15,10 +17,27 @@ int GameScreen::run(sf::RenderWindow &window) {
 		return TILEMAP_LOAD_ERROR;
 	}
 	layoutTiles(window);
-
+	
+	//to be incorporated into a loadCreeps function
+	sf::Texture creeps;
+	if (! creeps.loadFromFile(mapPath_+"res/tiles.png")) {
+		Logger::log("GameScreen could not load creeps");
+		return CREEP_LOAD_ERROR;
+	}
+	//end
+	
+	Path path;
+	path.updatePaths(tiles_, numTilesX_, numTilesY_);
+	Creep::setPath(path);
+	
+	creeps_.push_back(Creep(2,numTilesX_,tileSize_,1));
+	
 	while (true) {
+		Updateable::updateDelta();
+		updateCreeps();
 		window.clear(sf::Color::Blue);
 		drawTiles(window);
+		drawCreeps(window,creeps);
 		window.display();
 	}
 
@@ -36,6 +55,19 @@ void GameScreen::drawTiles(sf::RenderWindow &window) {
 	return;
 }
 
+void GameScreen::drawCreeps(sf::RenderWindow &window,sf::Texture &creeps) {
+	for (size_t i=0;i<creeps_.size();++i) {
+		creeps_.at(i).draw(window,creeps);
+	}
+	return;
+}
+
+void GameScreen::updateCreeps(){
+	for (size_t i=0; i<creeps_.size();++i) {
+		creeps_.at(i).update();
+	}
+	return;
+}
 void GameScreen::layoutTiles(sf::RenderWindow &window) {
 	// Get the drawn tile size
 	int drawnTileSize;
@@ -108,6 +140,7 @@ bool GameScreen::loadTiles(std::string mapPath) {
 		Logger::log("Could not load info from creep_spawn attribute in tilemap.xml");
 		return false;
 	}
+	creepSpawnTile --;
 
 	// Load creep exit tile
 	int creepExitTile;
@@ -116,6 +149,7 @@ bool GameScreen::loadTiles(std::string mapPath) {
 		Logger::log("Could not load info from creep_exit attribute in tilemap.xml");
 		return false;
 	}
+	creepExitTile --;
 
 	// Load TileSet texture
 	const char* tileSetTexture = tileSetElement->Attribute("src");
@@ -144,7 +178,6 @@ bool GameScreen::loadTiles(std::string mapPath) {
 
 		currTile.setId(idVector.at(i));
 		currTile.setTileSize(tileSize_);
-
 
 		if (std::find(creepWalkableTiles.begin(),
 				creepWalkableTiles.end(), idVector.at(i)) != creepWalkableTiles.end()) {
@@ -203,4 +236,20 @@ std::vector<int> GameScreen::tokenizeIntString(std::string str, std::string deli
 void GameScreen::setMapPath(std::string mapPath) {
 	mapPath_ = mapPath;
 	return;
+}
+
+std::vector<Tile> GameScreen::getTileMap() {
+	return tiles_;
+}
+
+int GameScreen::getNumTilesX() {
+	return numTilesX_;
+}
+
+int GameScreen::getNumTilesY() {
+	return numTilesY_;
+}
+
+int GameScreen::getTileSize() {
+	return tileSize_;
 }
