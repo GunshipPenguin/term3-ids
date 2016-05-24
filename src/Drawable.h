@@ -16,8 +16,6 @@ protected:
 	int tileSize_;
 	float x_;
 	float y_;
-
-private:
 	static int drawnSize_;
 
 };
