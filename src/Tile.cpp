@@ -12,7 +12,7 @@ void Tile::draw(sf::RenderWindow &window, sf::Texture &tiles) {
 	sf::Sprite sprite = getSpriteById(id_, tiles, tileSize_);
 	sprite.setPosition(x_, y_);
 
-	float scale = drawnSize_ / sprite.getLocalBounds().width;
+	float scale = Drawable::getDrawnSize() / sprite.getLocalBounds().width;
 	sprite.setScale(scale, scale);
 
 	window.draw(sprite);

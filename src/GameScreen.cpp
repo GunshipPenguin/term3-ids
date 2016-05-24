@@ -7,7 +7,6 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <set>
 #include <tinyxml2.h>
 #include <SFML/Graphics.hpp>
 
@@ -17,27 +16,49 @@ int GameScreen::run(sf::RenderWindow &window) {
 		return TILEMAP_LOAD_ERROR;
 	}
 	layoutTiles(window);
-	
-	//to be incorporated into a loadCreeps function
-	sf::Texture creeps;
-	if (! creeps.loadFromFile(mapPath_+"res/tiles.png")) {
-		Logger::log("GameScreen could not load creeps");
-		return CREEP_LOAD_ERROR;
-	}
-	//end
-	
+
+	// Set up creep path object
 	Path path;
 	path.updatePaths(tiles_, numTilesX_, numTilesY_);
 	Creep::setPath(path);
-	
-	creeps_.push_back(Creep(2,numTilesX_,tileSize_,1));
-	
+
+	// Set up map and window views
+	sf::View mapView = getMapView(window.getSize().x, window.getSize().y);
+	sf::View menuView = getMenuView(window.getSize().x, window.getSize().y);
+
+	// Event object to poll for
+	sf::Event event;
+
+	// Menu shape to fill menuView
+	sf::RectangleShape menuShape(menuView.getSize());
+	menuShape.setFillColor(sf::Color::Blue);
+
+	// Main loop
 	while (true) {
+		window.clear(sf::Color::Black);
 		Updateable::updateDelta();
 		updateCreeps();
-		window.clear(sf::Color::Blue);
+
+		// Handle events
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) {
+				window.close();
+			} else if (event.type == sf::Event::Resized) {
+				mapView = getMapView(window.getSize().x, window.getSize().y);
+				menuView = getMenuView(window.getSize().x, window.getSize().y);
+				menuShape.setSize(menuView.getSize());
+			}
+		}
+		// Draw map
+		window.setView(mapView);
 		drawTiles(window);
-		drawCreeps(window,creeps);
+		//drawCreeps(window, sf::Texture());
+
+		// Draw menu
+		window.setView(menuView);
+		menuShape.setPosition(0, 0);
+		window.draw(menuShape);
+
 		window.display();
 	}
 
@@ -45,6 +66,47 @@ int GameScreen::run(sf::RenderWindow &window) {
 	sf::sleep(t1);
 
 	return 0;
+}
+
+sf::View GameScreen::getMenuView(int screenWidth, int screenHeight) {
+	sf::View menuView(sf::FloatRect(0, 0, screenWidth*MENU_SIZE, screenHeight));
+	menuView.setViewport(sf::FloatRect(1-MENU_SIZE, 0, MENU_SIZE, 1));
+	return menuView;
+}
+
+sf::View GameScreen::getMapView(int screenWidth, int screenHeight) {
+	// Fit the mapView around all the tiles
+	sf::View mapView(sf::FloatRect(0, 0,
+				numTilesX_*Drawable::getDrawnSize(),
+				numTilesY_*Drawable::getDrawnSize()));
+
+	int xAvaliable = screenWidth * (1-MENU_SIZE);
+
+	float windowRatio = xAvaliable / (float) screenHeight;
+	float viewRatio = mapView.getSize().x / (float) mapView.getSize().y;
+	float sizeX = 1;
+	float sizeY = 1;
+	float posX = 0;
+	float posY = 0;
+
+	bool horizontalSpacing = true;
+	if (windowRatio < viewRatio)
+		horizontalSpacing = false;
+
+	if (horizontalSpacing) {
+		posY = 0;
+		sizeY = 1;
+		sizeX = (sizeY*screenHeight*viewRatio)/screenWidth;
+		posX = (1-MENU_SIZE-sizeX)/2;
+	} else {
+		posX = 0;
+		sizeX = (1-MENU_SIZE);
+		sizeY = (sizeX*screenWidth*viewRatio)/screenHeight;
+		posY= (1-sizeY) / 2;
+	}
+
+	mapView.setViewport(sf::FloatRect(posX, posY, sizeX, sizeY));
+	return mapView;
 }
 
 void GameScreen::drawTiles(sf::RenderWindow &window) {
@@ -55,7 +117,7 @@ void GameScreen::drawTiles(sf::RenderWindow &window) {
 	return;
 }
 
-void GameScreen::drawCreeps(sf::RenderWindow &window,sf::Texture &creeps) {
+void GameScreen::drawCreeps(sf::RenderWindow &window, sf::Texture &creeps) {
 	for (size_t i=0;i<creeps_.size();++i) {
 		creeps_.at(i).draw(window,creeps);
 	}
@@ -69,26 +131,12 @@ void GameScreen::updateCreeps(){
 	return;
 }
 void GameScreen::layoutTiles(sf::RenderWindow &window) {
-	// Get the drawn tile size
-	int drawnTileSize;
-	if (window.getSize().x / numTilesX_ > window.getSize().y / numTilesY_) {
-		drawnTileSize = window.getSize().y / numTilesY_;
-	} else {
-		drawnTileSize = window.getSize().x / numTilesX_;
-	}
-
-	Drawable::setDrawnSize(drawnTileSize);
-
-	// Get offsets
-	int xOffset = 0.5*(window.getSize().x - numTilesX_*drawnTileSize);
-	int yOffset = 0.5*(window.getSize().y - numTilesY_*drawnTileSize);
-
 	size_t i;
 	sf::Vector2f position;
 	int x, y;
 	for (i=0;i<tiles_.size();i++) {
-		x = (i % numTilesX_) * drawnTileSize + xOffset;
-		y = (i / numTilesX_) * drawnTileSize + yOffset;
+		x = (i % numTilesX_) * Drawable::getDrawnSize();
+		y = (i / numTilesX_) * Drawable::getDrawnSize();
 		tiles_.at(i).setPosition(x, y);
 	}
 	return;
@@ -124,6 +172,7 @@ bool GameScreen::loadTiles(std::string mapPath) {
 		Logger::log("Could not find size element of tile_set element");
 		return false;
 	}
+	Drawable::setDrawnSize(tileSize_);
 
 	// Load creep walkable tiles
 	std::string creepWalkableTilesString(tileSetElement->Attribute("creep_walkable"));
@@ -207,12 +256,12 @@ bool GameScreen::loadTiles(std::string mapPath) {
 	return true;
 }
 
-std::vector<int> GameScreen::tokenizeIntString(std::string str, std::string delimetirs) {
+std::vector<int> GameScreen::tokenizeIntString(std::string str, std::string delimeters) {
 	std::string currToken;
 	int intToken;
 
-	std::string::size_type lastPos = str.find_first_not_of("\n,", 0);
-	std::string::size_type pos = str.find_first_of("\n,", lastPos);
+	std::string::size_type lastPos = str.find_first_not_of(delimeters, 0);
+	std::string::size_type pos = str.find_first_of(delimeters, lastPos);
 
 	std::vector<int> tokenVector;
 
@@ -221,8 +270,8 @@ std::vector<int> GameScreen::tokenizeIntString(std::string str, std::string deli
 		intToken = atoi(currToken.c_str());
 
 		// Skip delimiters
-		lastPos = str.find_first_not_of("\n,", pos);
-		pos = str.find_first_of("\n,", lastPos);
+		lastPos = str.find_first_not_of(delimeters, pos);
+		pos = str.find_first_of(delimeters, lastPos);
 
 		// Special case where currToken is the final tab
 		if (intToken == 0)

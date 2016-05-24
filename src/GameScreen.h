@@ -16,6 +16,8 @@ public:
 	int getNumTilesX();
 	int getNumTilesY();
 	int getTileSize();
+	static const float MENU_SIZE = 0.2;
+
 	static const int TILEMAP_LOAD_ERROR = 1;
 	static const int CREEP_LOAD_ERROR = 2;
 
@@ -27,6 +29,8 @@ private:
 	bool loadTiles(std::string);
 	void setTilePositions(sf::RenderWindow&);
 	void layoutTiles(sf::RenderWindow&);
+	sf::View getMenuView(int, int);
+	sf::View getMapView(int, int);
 	std::vector<int> tokenizeIntString(std::string, std::string);
 
 	int numTilesX_;
