@@ -1,26 +1,42 @@
 #include "GameScreen.h"
 #include "Logger.h"
 #include "Tile.h"
+#include "TileMap.h"
+#include "TileSet.h"
+#include "Wave.h"
 #include "Creep.h"
-#include "Path.h"
+#include "CreepPathfinder.h"
+
 #include <string>
-#include <fstream>
+#include <map>
+#include <sstream>
 #include <iostream>
 #include <vector>
 #include <tinyxml2.h>
 #include <SFML/Graphics.hpp>
 
 int GameScreen::run(sf::RenderWindow &window) {
-	if (! loadTiles(mapPath_)) {
+	if (! loadTileMap()) {
 		Logger::log("GameScreen could not load tiles");
 		return TILEMAP_LOAD_ERROR;
 	}
-	layoutTiles(window);
 
-	// Set up creep path object
-	Path path;
-	path.updatePaths(tiles_, numTilesX_, numTilesY_);
-	Creep::setPath(path);
+	// Set up CreepPathfinder object
+	// TODO set up creepPathfinder with the TileMap once Devin fixes up Creeps
+	CreepPathfinder creepPathfinder;
+	Creep::setCreepPathfinder(creepPathfinder);
+
+	// Load Creeps
+	if (! loadCreeps()) {
+		Logger::log("GameScreen could not load creeps");
+		return CREEP_LOAD_ERROR;
+	}
+
+	// Load Waves
+	if (! loadWaves()) {
+		Logger::log("Waves could not be loaded");
+		return WAVE_LOAD_ERROR;
+	}
 
 	// Set up map and window views
 	sf::View mapView = getMapView(window.getSize().x, window.getSize().y);
@@ -35,9 +51,17 @@ int GameScreen::run(sf::RenderWindow &window) {
 
 	// Main loop
 	while (true) {
-		window.clear(sf::Color::Black);
+		// Update time delta and wave
 		Updateable::updateDelta();
-		updateCreeps();
+
+		if (waveOngoing_)
+			waves_.front().update();
+
+		// Check to see if the current wave is defeated
+		if (waveOngoing_ && waves_.front().isDefeated()) {
+			waveOngoing_ = false;
+			waves_.pop();
+		}
 
 		// Handle events
 		while (window.pollEvent(event)) {
@@ -49,10 +73,16 @@ int GameScreen::run(sf::RenderWindow &window) {
 				menuShape.setSize(menuView.getSize());
 			}
 		}
+
+		// Clear screen before drawing anything
+		window.clear(sf::Color::Black);
+
 		// Draw map
 		window.setView(mapView);
-		drawTiles(window);
-		//drawCreeps(window, sf::Texture());
+		if (waveOngoing_)
+			waves_.front().draw(window);
+
+		tileMap_.draw(window);
 
 		// Draw menu
 		window.setView(menuView);
@@ -61,9 +91,6 @@ int GameScreen::run(sf::RenderWindow &window) {
 
 		window.display();
 	}
-
-	sf::Time t1 = sf::seconds(500.0f);
-	sf::sleep(t1);
 
 	return 0;
 }
@@ -77,8 +104,8 @@ sf::View GameScreen::getMenuView(int screenWidth, int screenHeight) {
 sf::View GameScreen::getMapView(int screenWidth, int screenHeight) {
 	// Fit the mapView around all the tiles
 	sf::View mapView(sf::FloatRect(0, 0,
-				numTilesX_*Drawable::getDrawnSize(),
-				numTilesY_*Drawable::getDrawnSize()));
+				tileMap_.getNumTilesX()*TileSet::getDrawnSize(),
+				tileMap_.getNumTilesY()*TileSet::getDrawnSize()));
 
 	int xAvaliable = screenWidth * (1-MENU_SIZE);
 
@@ -109,43 +136,127 @@ sf::View GameScreen::getMapView(int screenWidth, int screenHeight) {
 	return mapView;
 }
 
-void GameScreen::drawTiles(sf::RenderWindow &window) {
-	size_t i;
-	for (i=0;i<tiles_.size();i++) {
-		tiles_.at(i).draw(window, tilesTexture_);
-	}
-	return;
-}
-
-void GameScreen::drawCreeps(sf::RenderWindow &window, sf::Texture &creeps) {
-	for (size_t i=0;i<creeps_.size();++i) {
-		creeps_.at(i).draw(window,creeps);
-	}
-	return;
-}
-
-void GameScreen::updateCreeps(){
-	for (size_t i=0; i<creeps_.size();++i) {
-		creeps_.at(i).update();
-	}
-	return;
-}
-void GameScreen::layoutTiles(sf::RenderWindow &window) {
-	size_t i;
-	sf::Vector2f position;
-	int x, y;
-	for (i=0;i<tiles_.size();i++) {
-		x = (i % numTilesX_) * Drawable::getDrawnSize();
-		y = (i / numTilesX_) * Drawable::getDrawnSize();
-		tiles_.at(i).setPosition(x, y);
-	}
-	return;
-}
-
-bool GameScreen::loadTiles(std::string mapPath) {
+bool GameScreen::loadWaves() {
 	// Load XML document
 	tinyxml2::XMLDocument doc;
-	std::string tileMapPath = mapPath + "/tilemap.xml";
+	std::string creepsFilePath = mapPath_ + "/waves.xml";
+	if(doc.LoadFile(creepsFilePath.c_str()) != tinyxml2::XML_NO_ERROR) {
+		Logger::log("Could not load waves.xml");
+		return false;
+	}
+
+	// Get waves element
+	tinyxml2::XMLElement* wavesElement = doc.FirstChildElement("waves");
+	tinyxml2::XMLElement* currWaveElement = wavesElement->FirstChildElement();
+
+	// Loop through and load all waves
+	while(true) {
+		if (currWaveElement == 0) {
+			break;
+		}
+
+		// Get wave entry speed
+		int entrySpeed;
+		if(currWaveElement->QueryIntAttribute("entrySpeed", &entrySpeed) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not find entry speed of wave in waves.xml");
+			return false;
+		}
+
+		// Build vector of wave creeps
+		std::string creepIdString = currWaveElement->GetText();
+		creepIdString.erase(std::remove(creepIdString.begin(),
+				creepIdString.end(), '\n'), creepIdString.end());
+		creepIdString.erase(std::remove(creepIdString.begin(),
+				creepIdString.end(), '\t'), creepIdString.end());
+		std::istringstream ss(creepIdString);
+		std::string creepId;
+		std::vector<Creep> creepVector;
+
+		while(std::getline(ss, creepId, ',')) {
+			if (loadedCreeps_.find(creepId) == loadedCreeps_.end()) {
+				Logger::log("Creep with id of " + creepId + " does not exist");
+				return false;
+			}
+			// TODO build up creepVector once Devin fixes up Creeps
+			// creepVector.push_back(Creep());
+		}
+
+		waves_.push(Wave(creepVector, entrySpeed));
+		currWaveElement = currWaveElement->NextSiblingElement();
+	}
+	return true;
+}
+
+bool GameScreen::loadCreeps() {
+	// Load XML document
+	tinyxml2::XMLDocument doc;
+	std::string creepsFilePath = mapPath_ + "/creeps.xml";
+	if(doc.LoadFile(creepsFilePath.c_str()) != tinyxml2::XML_NO_ERROR) {
+		Logger::log("Could not load creeps.xml");
+		return false;
+	}
+
+	// Get creeps element
+	tinyxml2::XMLElement* creepsElement = doc.FirstChildElement("creeps");
+	tinyxml2::XMLElement* currCreepElement = creepsElement->FirstChildElement();
+
+	// Find creepSpawn
+	size_t i;
+	int creepSpawn;
+	for(i=0;i<tileMap_.getTiles().size();i++) {
+		if(tileMap_.getTiles().at(i).isCreepSpawn()) {
+			creepSpawn = static_cast<int>(i);
+			break;
+		}
+	}
+
+	// Loop through and load all creeps
+	while(true) {
+		if (currCreepElement == 0) {
+			break;
+		}
+
+		// Get creep id
+		std::string creepId;
+		creepId = currCreepElement->Attribute("id");
+		if(creepId.empty()) {
+			Logger::log("Invalid or missing id of creep in creeps.xml");
+		}
+
+		// Get creep speed
+		int creepSpeed;
+		if(currCreepElement->QueryIntAttribute("speed", &creepSpeed) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not find speed of creep in creeps.xml");
+			return false;
+		}
+
+		// Get creep tileSize
+		int creepTileSize;
+		if(currCreepElement->QueryIntAttribute("tileSize", &creepTileSize) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not find tileSize of creep in creeps.xml");
+			return false;
+		}
+
+		// Load creep texture
+		sf::Texture creepTexture;
+		std::string textureDir = mapPath_ + "/res/" + currCreepElement->Attribute("texture");
+		if (!creepTexture.loadFromFile(textureDir)) {
+			Logger::log("Could not load creep texture in creeps.xml");
+			return false;
+		}
+
+		creepTileSets_[creepId] = TileSet(creepTexture, creepTileSize);
+		// TODO, Fill up the loadedCreeps array once Devin fixes up Creeps
+
+		currCreepElement = currCreepElement->NextSiblingElement();
+	}
+	return true;
+}
+
+bool GameScreen::loadTileMap() {
+	// Load XML document
+	tinyxml2::XMLDocument doc;
+	std::string tileMapPath = mapPath_ + "/tilemap.xml";
 	if(doc.LoadFile(tileMapPath.c_str()) != tinyxml2::XML_NO_ERROR) {
 		Logger::log("Could not load tilemap.xml");
 		return false;
@@ -162,17 +273,33 @@ bool GameScreen::loadTiles(std::string mapPath) {
 	if (tileMapElement->QueryIntAttribute("height", &height)) {
 		Logger::log("Could not find height attribute of tile_map element");
 	}
-	numTilesX_ = width;
-	numTilesY_ = height;
+	int numTilesX = width;
+	int numTilesY = height;
 
-	// Load TileSet size
+	// Load the size of the tileset to be used as the drawn size for all tiles
+	int tileSize;
 	tinyxml2::XMLElement* tileSetElement = tileMapElement->FirstChildElement(
 			"tile_set");
-	if(tileSetElement->QueryIntAttribute("size", &tileSize_) != tinyxml2::XML_NO_ERROR) {
+	if(tileSetElement->QueryIntAttribute("size", &tileSize) != tinyxml2::XML_NO_ERROR) {
 		Logger::log("Could not find size element of tile_set element");
 		return false;
 	}
-	Drawable::setDrawnSize(tileSize_);
+	TileSet::setDrawnSize(tileSize);
+	tileSet_.setTileSize(tileSize);
+
+	// Load TileSet texture
+	const char* tileSetTexture = tileSetElement->Attribute("src");
+	if (tileSetTexture == NULL) {
+		Logger::log("No path to texture specified by src attribute of tile_set element");
+		return false;
+	}
+	std::string textureDir = mapPath_ + "/res/" + tileSetElement->Attribute("src");
+	if (tilesTexture_.loadFromFile(textureDir) == false) {
+		Logger::log("Could not load tile_set texture specified in src attribute");
+		return false;
+	}
+	tilesTexture_.setSmooth(false);
+	tileSet_.setTexture(tilesTexture_);
 
 	// Load creep walkable tiles
 	std::string creepWalkableTilesString(tileSetElement->Attribute("creep_walkable"));
@@ -200,33 +327,21 @@ bool GameScreen::loadTiles(std::string mapPath) {
 	}
 	creepExitTile --;
 
-	// Load TileSet texture
-	const char* tileSetTexture = tileSetElement->Attribute("src");
-	if (tileSetTexture == NULL) {
-		Logger::log("No path to texture specified by src attribute of tile_set element");
-		return false;
-	}
-
-	std::string textureDir = mapPath + "/res/" + tileSetElement->Attribute("src");
-	if (tilesTexture_.loadFromFile(textureDir) == false) {
-		Logger::log("Could not load tile_set texture specified in src attribute");
-		return false;
-	}
-
 	// Load tile id data
 	tinyxml2::XMLElement* tileDataElement = tileMapElement->FirstChildElement(
 			"tile_data");
 	std::string tileDataString(tileDataElement->GetText());
 
+	// Fill up the tiles vector
 	std::vector<int> idVector = tokenizeIntString(tileDataString, "\n,");
-	size_t i;
+	std::vector<Tile> tiles;
 	Tile currTile;
 
-	for(i=0;i<idVector.size();i++) {
+	for(size_t i=0;i<idVector.size();i++) {
 		currTile = Tile();
 
 		currTile.setId(idVector.at(i));
-		currTile.setTileSize(tileSize_);
+		currTile.setTileSet(&tileSet_);
 
 		if (std::find(creepWalkableTiles.begin(),
 				creepWalkableTiles.end(), idVector.at(i)) != creepWalkableTiles.end()) {
@@ -237,21 +352,26 @@ bool GameScreen::loadTiles(std::string mapPath) {
 			currTile.setBuildable(true);
 		}
 
-		tiles_.push_back(currTile);
+		tiles.push_back(currTile);
 	}
 
 	// Ensure that the number of tiles specified is equal to numTilesX_ * numTilesY_
-	if (tiles_.size() != (unsigned int) numTilesX_ * numTilesY_) {
+	if (tiles.size() != (size_t) numTilesX * numTilesY) {
 		Logger::log("Number of tiles in tilemap.xml differs "
 				"from the amount specified in width and height attribute of tile_map");
 		return false;
 	}
 
 	// Mark creep spawn
-	tiles_.at(creepSpawnTile).setCreepSpawn(true);
+	tiles.at(creepSpawnTile).setCreepSpawn(true);
 
 	// Mark creep exit
-	tiles_.at(creepExitTile).setCreepExit(true);
+	tiles.at(creepExitTile).setCreepExit(true);
+
+	// Create TileMap object
+	tileMap_.setTiles(tiles);
+	tileMap_.setNumTilesX(numTilesX);
+	tileMap_.layoutTiles(TileSet::getDrawnSize());
 
 	return true;
 }
@@ -285,20 +405,4 @@ std::vector<int> GameScreen::tokenizeIntString(std::string str, std::string deli
 void GameScreen::setMapPath(std::string mapPath) {
 	mapPath_ = mapPath;
 	return;
-}
-
-std::vector<Tile> GameScreen::getTileMap() {
-	return tiles_;
-}
-
-int GameScreen::getNumTilesX() {
-	return numTilesX_;
-}
-
-int GameScreen::getNumTilesY() {
-	return numTilesY_;
-}
-
-int GameScreen::getTileSize() {
-	return tileSize_;
 }

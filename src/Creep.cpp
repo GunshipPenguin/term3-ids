@@ -2,24 +2,28 @@
 #include "Updateable.h"
 #include "Tile.h"
 #include "Creep.h"
-#include "Path.h"
-#include <iostream> // remove after testing
 #include <vector>
 #include <cmath>
 #include <SFML/Graphics.hpp>
+#include "CreepPathfinder.h"
 
-Path Creep::paths_;
+CreepPathfinder Creep::paths_;
 
-Creep::Creep(int spawn, int numTilesX, int tileSize, double speed) {//tilesize ->drawnTileSize
+Creep::Creep(int spawn, int numTilesX, int tileSize, double speed, std::string id) {//tilesize ->drawnTileSize
 	coordinates_.x = (spawn%numTilesX)*tileSize;
 	coordinates_.y = (spawn/numTilesX)*tileSize;
 	speed_ = speed;
+	id_ = id;
 	pathPosition_ = 0;
 	tileSize_ = tileSize;
 	numTilesX_ = numTilesX;
 	x_ = coordinates_.x;
 	y_ = coordinates_.y;
 	path_ = paths_.getPathToEndFromID(spawn);
+}
+
+std::string Creep::getId() {
+	return id_;
 }
 
 int Creep::getPositionByTile() {
@@ -83,14 +87,13 @@ void Creep::setFuturePosition(double timeDelta, float& x, float& y) {
 	return;
 }
 
-void Creep::draw(sf::RenderWindow &window, sf::Texture &creeps) {
-	sf::Sprite creep = getSpriteById(1,creeps,16);
-	creep.setPosition(x_,y_);
-	
-	float scale = drawnSize_ / creep.getLocalBounds().width;
-	creep.setScale(scale,scale);
-	
-	window.draw(creep);
+void Creep::draw(sf::RenderWindow &window) {
+	if (tileSet_) {
+		sf::Sprite creepSprite = tileSet_->getSpriteById(1);
+		creepSprite.setPosition(x_,y_);
+
+		window.draw(creepSprite);
+	}
 	return;
 }
 
@@ -99,6 +102,6 @@ void Creep::update() {
 	return;
 }
 
-void Creep::setPath(Path& path) {
+void Creep::setCreepPathfinder(CreepPathfinder& path) {
 	paths_ = path;
 }

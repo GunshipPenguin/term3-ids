@@ -3,23 +3,24 @@
 
 #include <SFML/Graphics.hpp>
 #include "Drawable.h"
+#include "TileSet.h"
 
 class Tile : public Drawable {
 public:
 	void setId(int);
-	int getId();
 	void setCreepExit(bool);
 	void setCreepSpawn(bool);
 	void setCreepWalkable(bool);
 	void setBuilt(bool);
 	void setBuildable(bool);
 	void setSprite(sf::Sprite);
-	bool isCreepExit();
-	bool isCreepSpawn();
-	bool isCreepWalkable();
-	bool isBuildable();
-	bool isBuilt();
-	void draw(sf::RenderWindow&, sf::Texture &tiles);
+	int getId() const;
+	bool isCreepExit() const ;
+	bool isCreepSpawn() const;
+	bool isCreepWalkable() const;
+	bool isBuildable() const;
+	bool isBuilt() const;
+	void draw(sf::RenderWindow&);
 
 private:
 	int id_;

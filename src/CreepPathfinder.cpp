@@ -1,10 +1,11 @@
 #include <vector>
 #include <queue>
 #include <iostream>
-#include "Path.h"
+
+#include "CreepPathfinder.h"
 #include "Tile.h"
 
-void Path::updatePaths(std::vector<Tile>& tileMap,int numTilesX, int numTilesY) {
+void CreepPathfinder::updatePaths(std::vector<Tile>& tileMap,int numTilesX, int numTilesY) {
 	std::vector<int> positions(numTilesX*numTilesY,-1);
 	std::queue<int> q;
 	int currTile;
@@ -44,7 +45,7 @@ void Path::updatePaths(std::vector<Tile>& tileMap,int numTilesX, int numTilesY) 
 	
 }
 
-std::vector<int> Path::getPathToEndFromID(int ID) { 
+std::vector<int> CreepPathfinder::getPathToEndFromID(int ID) { 
 	std::vector<int> path;
 	path.push_back(ID);
 	while (ID != exitTile_) {
@@ -54,17 +55,17 @@ std::vector<int> Path::getPathToEndFromID(int ID) {
 	return path;
 }
 
-int Path::getNextByID(int ID, int increase) {
+int CreepPathfinder::getNextByID(int ID, int increase) {
 	for (int i = 0; i < increase; ++i) {
 		ID = directedPathGraph_.at(ID);
 	}
 	return ID;
 }
 
-int Path::getXById(int Id, int numTilesX) {
+int CreepPathfinder::getXById(int Id, int numTilesX) {
 	return Id%numTilesX;
 }
 
-int Path::getYById(int Id, int numTilesX) {
+int CreepPathfinder::getYById(int Id, int numTilesX) {
 	return Id/numTilesX;
 }

@@ -2,21 +2,18 @@
 #define DRAWABLE_H
 
 #include <SFML/Graphics.hpp>
+#include "TileSet.h"
 
 class Drawable {
 public:
-	virtual void draw(sf::RenderWindow &window, sf::Texture &tiles) = 0;
-	void setTileSize(int tileSize);
+	virtual void draw(sf::RenderWindow&) = 0;
 	void setPosition(int, int);
-	static void setDrawnSize(int);
-	static int getDrawnSize();
+	void setTileSet(TileSet*);
 
 protected:
-	sf::Sprite getSpriteById(int id, sf::Texture&, int tileSize);
-	int tileSize_;
+	TileSet* tileSet_;
 	float x_;
 	float y_;
-	static int drawnSize_;
 
 };
 

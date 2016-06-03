@@ -5,7 +5,7 @@
 #include <vector>
 #include "Tile.h"
 
-class Path {
+class CreepPathfinder {
 public:
 	void updatePaths(std::vector<Tile>&,int,int);
 	std::vector<int> getPathToEndFromID(int);

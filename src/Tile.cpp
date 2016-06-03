@@ -8,18 +8,16 @@ void Tile::setId(int id) {
 	return;
 }
 
-void Tile::draw(sf::RenderWindow &window, sf::Texture &tiles) {
-	sf::Sprite sprite = getSpriteById(id_, tiles, tileSize_);
-	sprite.setPosition(x_, y_);
-
-	float scale = Drawable::getDrawnSize() / sprite.getLocalBounds().width;
-	sprite.setScale(scale, scale);
-
-	window.draw(sprite);
+void Tile::draw(sf::RenderWindow &window) {
+	if(tileSet_) {
+		sf::Sprite sprite = tileSet_->getSpriteById(id_);
+		sprite.setPosition(x_, y_);
+		window.draw(sprite);
+	}
 	return;
 }
 
-int Tile::getId() {
+int Tile::getId() const {
 	return id_;
 }
 
@@ -43,22 +41,22 @@ void Tile::setBuildable(bool buildable) {
 	buildable_ = buildable;
 }
 
-bool Tile::isCreepExit() {
+bool Tile::isCreepExit() const {
 	return creepExit_;
 }
 
-bool Tile::isCreepSpawn() {
+bool Tile::isCreepSpawn() const {
 	return creepSpawn_;
 }
 
-bool Tile::isCreepWalkable() {
+bool Tile::isCreepWalkable() const {
 	return creepWalkable_;
 }
 
-bool Tile::isBuilt() {
+bool Tile::isBuilt() const {
 	return built_;
 }
 
-bool Tile::isBuildable() {
+bool Tile::isBuildable() const {
 	return buildable_;
 }

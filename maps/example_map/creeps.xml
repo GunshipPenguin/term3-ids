@@ -1,22 +1,8 @@
 <creeps>
 	<creep
 		name="Sheep"
+		id="1"
 		hp="10"
-		num="10"
 		speed="2"
-		img="creep_images/sheep.png"/>
-	
-	<creep
-		name="bandits"
-		hp="15"
-		num="11"
-		speed="4"
-		img="creep_images/bandit.png" />
-		
-	<creep
-		name="Warriors"
-		hp="20"
-		num="15"
-		speed="3"
-		tiles="creep_images/warrior.png" />
+		texture="sheep.png"/>
 </creeps>

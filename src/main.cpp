@@ -8,8 +8,8 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-	int width = 160;
-	int height = 160;
+	int width = 300;
+	int height = 300;
 
 	ResourceManager::setBinPath(std::string(argv[0]));
 
