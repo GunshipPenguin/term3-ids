@@ -12,23 +12,22 @@
 
 class Creep: public Updateable, public Drawable {
 public:
-	Creep(int,int,int,double,std::string);
-	int getPositionByTile();
-	sf::Vector2f getPosition(bool);//boolean is for centered
-	void setFuturePosition(double timeDelta,float& x,float& y);//boolean is for centered
+	Creep();
+	Creep(int,int,double,std::string);
+	void getFuturePosition(double timeDelta, float& x, float& y);
+	void setFuturePosition(double timeDelta,float& x,float& y);
+	float getXPosition();
+	float getYPosition();
 	void update();
 	std::string getId();
 	void draw(sf::RenderWindow&);
 	static void setCreepPathfinder(CreepPathfinder&);
 private:
 	static CreepPathfinder paths_;
-	std::string id_;
-	std::vector<int> path_;
-	int pathPosition_;//updates when creep covers "next" tile
+	int comingFrom_;
+	int hp_;
 	double speed_;//represented as a fraction of a tile per second
-	int tileSize_;
-	int numTilesX_;
-	sf::Vector2f coordinates_;
+	std::string id_;
 };
 
 #endif

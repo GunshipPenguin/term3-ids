@@ -4,5 +4,6 @@
 		id="1"
 		hp="10"
 		speed="2"
+		tileSize="16"
 		texture="sheep.png"/>
 </creeps>

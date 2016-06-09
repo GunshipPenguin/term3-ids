@@ -35,10 +35,10 @@ const std::vector<Tile>& TileMap::getTiles() const {
 	return tiles_;
 }
 
-int TileMap::getNumTilesX() {
+int TileMap::getNumTilesX() const{
 	return numTilesX_;
 }
 
-int TileMap::getNumTilesY() {
+int TileMap::getNumTilesY() const{
 	return tiles_.size() / numTilesX_;
 }

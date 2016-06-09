@@ -4,16 +4,19 @@
 #include <iostream>
 #include <vector>
 #include "Tile.h"
+#include "TileMap.h"
 
 class CreepPathfinder {
 public:
-	void updatePaths(std::vector<Tile>&,int,int);
-	std::vector<int> getPathToEndFromID(int);
-	int getNextByID(int,int);
+	void updatePaths();
+	int getNextByID(int);
+	void setTileMap(const TileMap* tileMap);
+	int getNumTilesX();
 private:
 	int getYById(int,int);
 	int getXById(int,int);
 	int exitTile_;
+	const TileMap* tiles_;
 	std::vector<int> directedPathGraph_;
 };	
 

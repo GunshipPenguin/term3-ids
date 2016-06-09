@@ -9,82 +9,80 @@
 
 CreepPathfinder Creep::paths_;
 
-Creep::Creep(int spawn, int numTilesX, int tileSize, double speed, std::string id) {//tilesize ->drawnTileSize
-	coordinates_.x = (spawn%numTilesX)*tileSize;
-	coordinates_.y = (spawn/numTilesX)*tileSize;
+Creep::Creep() {}
+
+Creep::Creep(int spawn, int hp, double speed, std::string id) {//tilesize ->drawnTileSize
+	x_ = (spawn%paths_.getNumTilesX())*TileSet::getDrawnSize();//tileSize;
+	y_ = (spawn/paths_.getNumTilesX())*TileSet::getDrawnSize();//tileSize;
 	speed_ = speed;
+	hp_ = hp;
 	id_ = id;
-	pathPosition_ = 0;
-	tileSize_ = tileSize;
-	numTilesX_ = numTilesX;
-	x_ = coordinates_.x;
-	y_ = coordinates_.y;
-	path_ = paths_.getPathToEndFromID(spawn);
+	comingFrom_ = spawn;
 }
 
 std::string Creep::getId() {
 	return id_;
 }
 
-int Creep::getPositionByTile() {
-	sf::Vector2f centeredCoordinates(coordinates_);
-	centeredCoordinates.x += tileSize_/2;
-	centeredCoordinates.y += tileSize_/2;
-	return numTilesX_*(centeredCoordinates.y/tileSize_) + centeredCoordinates.x/tileSize_;
-}
-
-sf::Vector2f Creep::getPosition(bool centered) {
-	if (!centered) return coordinates_;
-	sf::Vector2f temp(coordinates_);
-	temp.x += tileSize_/2;
-	temp.y += tileSize_/2;
-	return temp;
+void Creep::getFuturePosition(double timeDelta, float& x, float& y) {
+	int tileSize = TileSet::getDrawnSize();
+	float distanceDelta(timeDelta*speed_);
+	while (distanceDelta > 0) {
+		int goingTo = paths_.getNextByID(comingFrom_);
+		if (comingFrom_ == goingTo-1) { //coming from left of goingTo
+			float distanceIntoTile = x - (comingFrom_)*tileSize;
+			if (distanceDelta >= tileSize - distanceIntoTile) {
+				distanceDelta -= (tileSize-distanceIntoTile);
+				x = (goingTo%paths_.getNumTilesX())*tileSize;
+				comingFrom_ = goingTo;
+			}else {
+				x += distanceDelta;
+				distanceDelta = 0;
+			}
+		}else if (comingFrom_ == goingTo+1) { //coming from right of goingTo
+			float distanceIntoTile = (comingFrom_)*tileSize -x;
+			if (distanceDelta >= tileSize - distanceIntoTile) {
+				distanceDelta -= (tileSize - distanceIntoTile);
+				x = (goingTo%paths_.getNumTilesX())*tileSize;
+				comingFrom_ = goingTo;
+			}else {
+				x -= distanceDelta;
+				distanceDelta = 0;
+			}
+		}else if (comingFrom_ == goingTo-paths_.getNumTilesX()) {//coming from above goingTo
+			float distanceIntoTile = y - comingFrom_/paths_.getNumTilesX() * tileSize;
+			if (distanceDelta >= tileSize - distanceIntoTile) {
+				distanceDelta -= (tileSize - distanceIntoTile);
+				y = (goingTo/paths_.getNumTilesX()) * tileSize;
+				comingFrom_ = goingTo;
+			}else {
+				y += distanceDelta;
+				distanceDelta = 0;
+			}
+		}else if (comingFrom_ == goingTo+paths_.getNumTilesX()) {//coming from below goingTo
+			float distanceIntoTile = comingFrom_/paths_.getNumTilesX() * tileSize -y;
+			if (distanceDelta >= tileSize - distanceIntoTile) {
+				distanceDelta -= (tileSize - distanceIntoTile);
+				y = (goingTo/paths_.getNumTilesX()) * tileSize;
+				comingFrom_ = goingTo;
+			}else {
+				y -= distanceDelta;
+				distanceDelta = 0;
+			}
+		}
+	}
 }
 
 void Creep::setFuturePosition(double timeDelta, float& x, float& y) {
-	float distanceIntoTile(static_cast<int>(floor(x))%tileSize_//is vrong
-							+(x-floor(x))
-							+static_cast<int>(floor(y))%tileSize_
-							+(y-floor(y)));
-	float distanceDelta(timeDelta*tileSize_*speed_);
-	int tileIncrease(floor(distanceDelta)/tileSize_);
-	
-	distanceIntoTile += distanceDelta - (tileIncrease * tileSize_);
-	
-	if (distanceIntoTile > tileSize_) {//might happen if creep was close to end of tile
-		tileIncrease += 1;
-		distanceIntoTile -= tileSize_;//now it is guaranteed to be accurate: lolNope
-	}
-	
-	
-	if (pathPosition_ + tileIncrease < path_.size()) {
-		x = (path_[pathPosition_+tileIncrease]%numTilesX_)*tileSize_;
-		y = (path_[pathPosition_+tileIncrease]/numTilesX_)*tileSize_;
-	} else {
-		pathPosition_ = path_.size() - 1;
-		//perhaps a boolean return?
-		return;
-	}
-	//coming from above
-	if (path_[pathPosition_+tileIncrease] == path_[pathPosition_+tileIncrease+1]-numTilesX_) {
-		y += distanceIntoTile;
-	}
-	//coming from below
-	else if (path_[pathPosition_+tileIncrease] == path_[pathPosition_+tileIncrease+1]+numTilesX_) {
-		y -= distanceIntoTile; 
-	}
-	//coming from the left
-	else if (path_[pathPosition_+tileIncrease] == path_[pathPosition_+tileIncrease+1]-1) {
-		x += distanceIntoTile;
-	}
-	//coming from the right
-	else if (path_[pathPosition_+tileIncrease] == path_[pathPosition_+tileIncrease+1]+1) {
-		x -= distanceIntoTile; 
-	}
-	
-	pathPosition_ += tileIncrease;
-	
-	return;
+	getFuturePosition(timeDelta,x,y);
+}
+
+float Creep::getXPosition() {
+	return x_;
+}
+
+float Creep::getYPosition() {
+	return y_;
 }
 
 void Creep::draw(sf::RenderWindow &window) {

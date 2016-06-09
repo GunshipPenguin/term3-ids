@@ -14,8 +14,8 @@ public:
 		tiles_(tiles),
 		numTilesX_(numTilesX) {};
 	const std::vector<Tile>& getTiles() const;
-	int getNumTilesX();
-	int getNumTilesY();
+	int getNumTilesX() const;
+	int getNumTilesY() const;
 	void setTiles(std::vector<Tile>&);
 	void layoutTiles(int);
 	void setNumTilesX(int);

@@ -22,8 +22,9 @@ int GameScreen::run(sf::RenderWindow &window) {
 	}
 
 	// Set up CreepPathfinder object
-	// TODO set up creepPathfinder with the TileMap once Devin fixes up Creeps
 	CreepPathfinder creepPathfinder;
+	creepPathfinder.setTileMap(&tileMap_);
+	creepPathfinder.updatePaths();
 	Creep::setCreepPathfinder(creepPathfinder);
 
 	// Load Creeps
@@ -178,7 +179,8 @@ bool GameScreen::loadWaves() {
 				return false;
 			}
 			// TODO build up creepVector once Devin fixes up Creeps
-			// creepVector.push_back(Creep());
+			Creep currCreep = loadedCreeps_[creepId];
+			creepVector.push_back(currCreep);
 		}
 
 		waves_.push(Wave(creepVector, entrySpeed));
@@ -229,6 +231,12 @@ bool GameScreen::loadCreeps() {
 			Logger::log("Could not find speed of creep in creeps.xml");
 			return false;
 		}
+		
+		int creepHp;
+		if(currCreepElement->QueryIntAttribute("hp", &creepHp) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not find hp of creep in creeps.xml");
+			return false;
+		}
 
 		// Get creep tileSize
 		int creepTileSize;
@@ -246,7 +254,7 @@ bool GameScreen::loadCreeps() {
 		}
 
 		creepTileSets_[creepId] = TileSet(creepTexture, creepTileSize);
-		// TODO, Fill up the loadedCreeps array once Devin fixes up Creeps
+		loadedCreeps_.insert(std::pair<std::string, Creep> (creepId, Creep(creepSpawn, creepHp, creepSpeed, creepId)));
 
 		currCreepElement = currCreepElement->NextSiblingElement();
 	}

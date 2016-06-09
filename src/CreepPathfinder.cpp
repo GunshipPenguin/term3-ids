@@ -1,14 +1,16 @@
 #include <vector>
 #include <queue>
 #include <iostream>
-
 #include "CreepPathfinder.h"
 #include "Tile.h"
 
-void CreepPathfinder::updatePaths(std::vector<Tile>& tileMap,int numTilesX, int numTilesY) {
-	std::vector<int> positions(numTilesX*numTilesY,-1);
+void CreepPathfinder::updatePaths() {
 	std::queue<int> q;
 	int currTile;
+	int numTilesX = tiles_->getNumTilesX();
+	int numTilesY = tiles_->getNumTilesY();
+	std::vector<Tile> tileMap = tiles_->getTiles();
+	std::vector<int> positions(numTilesX*numTilesY,-1);
 	
 	for (size_t i = 0; i < tileMap.size(); ++i) {
 		if (tileMap.at(i).isCreepExit()) {
@@ -45,21 +47,16 @@ void CreepPathfinder::updatePaths(std::vector<Tile>& tileMap,int numTilesX, int 
 	
 }
 
-std::vector<int> CreepPathfinder::getPathToEndFromID(int ID) { 
-	std::vector<int> path;
-	path.push_back(ID);
-	while (ID != exitTile_) {
-		ID = directedPathGraph_.at(ID);
-		path.push_back(ID);
-	}
-	return path;
+void CreepPathfinder::setTileMap(const TileMap* tileMap) {
+	tiles_ = tileMap;
 }
 
-int CreepPathfinder::getNextByID(int ID, int increase) {
-	for (int i = 0; i < increase; ++i) {
-		ID = directedPathGraph_.at(ID);
-	}
-	return ID;
+int CreepPathfinder::getNumTilesX() {
+	return (*tiles_).getNumTilesX();
+}
+
+int CreepPathfinder::getNextByID(int ID) {
+	return directedPathGraph_.at(ID);
 }
 
 int CreepPathfinder::getXById(int Id, int numTilesX) {
