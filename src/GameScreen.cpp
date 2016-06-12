@@ -260,8 +260,12 @@ bool GameScreen::loadCreeps() {
 			return false;
 		}
 
-		creepTileSets_[creepId] = TileSet(creepTexture, creepTileSize);
-		loadedCreeps_.insert(std::pair<std::string, Creep> (creepId, Creep(creepSpawn, creepHp, creepSpeed, creepId)));
+		TileSet creepTileSet = TileSet(creepTexture, creepTileSize);
+		creepTileSets_[creepId] = creepTileSet;
+
+		Creep creep = Creep(creepSpawn, creepHp, creepSpeed, creepId);
+		creep.setTileSet(&creepTileSets_[creepId]);
+		loadedCreeps_.insert(std::pair<std::string, Creep> (creepId, creep));
 
 		currCreepElement = currCreepElement->NextSiblingElement();
 	}
