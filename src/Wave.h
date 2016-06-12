@@ -9,11 +9,11 @@
 class Wave: public Updateable, public Drawable {
 public:
 	Wave() :
-		activeCreeps_(std::vector<Creep>()),
+		waitingCreeps_(std::vector<Creep>()),
 		entrySpeed_(1),
 		timeSinceLastCreep_(1) {};
-	Wave(std::vector<Creep> creeps, int entrySpeed) :
-		activeCreeps_(creeps),
+	Wave(std::vector<Creep> creeps, double entrySpeed) :
+		waitingCreeps_(creeps),
 		entrySpeed_(entrySpeed),
 		timeSinceLastCreep_(0) {};
 	const std::vector<Creep>& getActiveCreeps();
@@ -23,10 +23,10 @@ public:
 
 private:
 	void sendCreep();
-	std::vector<Creep> activeCreeps_;
-	int entrySpeed_;
-	int timeSinceLastCreep_;
 	std::vector<Creep> waitingCreeps_;
+	std::vector<Creep> activeCreeps_;
+	double entrySpeed_;
+	double timeSinceLastCreep_;
 };
 
 #endif

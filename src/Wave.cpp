@@ -28,6 +28,7 @@ void Wave::update() {
 
 	timeSinceLastCreep_ += delta_;
 	if (timeSinceLastCreep_ >= entrySpeed_ && !waitingCreeps_.empty()) {
+		timeSinceLastCreep_ = 0;
 		sendCreep();
 	}
 

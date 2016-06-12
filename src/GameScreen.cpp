@@ -50,6 +50,8 @@ int GameScreen::run(sf::RenderWindow &window) {
 	sf::RectangleShape menuShape(menuView.getSize());
 	menuShape.setFillColor(sf::Color::Blue);
 
+	waveOngoing_ = true;
+
 	// Main loop
 	while (true) {
 		// Update time delta and wave
@@ -75,20 +77,25 @@ int GameScreen::run(sf::RenderWindow &window) {
 			}
 		}
 
+
+
+
 		// Clear screen before drawing anything
 		window.clear(sf::Color::Black);
 
 		// Draw map
 		window.setView(mapView);
+		tileMap_.draw(window);
+
 		if (waveOngoing_)
 			waves_.front().draw(window);
-
-		tileMap_.draw(window);
 
 		// Draw menu
 		window.setView(menuView);
 		menuShape.setPosition(0, 0);
 		window.draw(menuShape);
+
+
 
 		window.display();
 	}
