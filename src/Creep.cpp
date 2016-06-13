@@ -25,8 +25,8 @@ std::string Creep::getId() {
 	return id_;
 }
 
-bool Creep:isLeaked() {
-	return leaked;
+bool Creep::isLeaked() {
+	return leaked_;
 }
 
 void Creep::getFuturePosition(double timeDelta, float& x, float& y) {
@@ -76,7 +76,7 @@ void Creep::getFuturePosition(double timeDelta, float& x, float& y) {
 			}
 		}else if (comingFrom_ == goingTo) {
 			distanceDelta = 0;
-			isLeaked_ = true;
+			leaked_ = true;
 		}
 	}
 }

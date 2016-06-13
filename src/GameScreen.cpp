@@ -50,8 +50,6 @@ int GameScreen::run(sf::RenderWindow &window) {
 	sf::RectangleShape menuShape(menuView.getSize());
 	menuShape.setFillColor(sf::Color::Blue);
 
-	waveOngoing_ = true;
-
 	// Main loop
 	while (true) {
 		// Update time delta and wave
@@ -59,26 +57,37 @@ int GameScreen::run(sf::RenderWindow &window) {
 
 		if (waveOngoing_)
 			waves_.front().update();
+			lives_ -= waves_.front().getCreepsLeakedSinceLastUpdate();
 
 		// Check to see if the current wave is defeated
 		if (waveOngoing_ && waves_.front().isDefeated()) {
 			waveOngoing_ = false;
 			waves_.pop();
+			if (waves_.empty()) {
+				Logger::log("All waves defeated");
+				return 0;
+			}
 		}
 
 		// Handle events
 		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed) {
+			switch (event.type) {
+			case sf::Event::Closed:
 				window.close();
-			} else if (event.type == sf::Event::Resized) {
+				return 0;
+			case sf::Event::Resized:
 				mapView = getMapView(window.getSize().x, window.getSize().y);
 				menuView = getMenuView(window.getSize().x, window.getSize().y);
 				menuShape.setSize(menuView.getSize());
+				break;
+			case sf::Event::KeyPressed:
+				if (event.key.code == sf::Keyboard::Space)
+					waveOngoing_ = true;
+				break;
+			default:
+				break;
 			}
 		}
-
-
-
 
 		// Clear screen before drawing anything
 		window.clear(sf::Color::Black);

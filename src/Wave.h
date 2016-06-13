@@ -11,14 +11,17 @@ public:
 	Wave() :
 		waitingCreeps_(std::vector<Creep>()),
 		entrySpeed_(1),
-		timeSinceLastCreep_(1) {};
+		timeSinceLastCreep_(1),
+		creepsLeakedSinceLastUpdate_(0) {};
 	Wave(std::vector<Creep> creeps, double entrySpeed) :
 		waitingCreeps_(creeps),
 		entrySpeed_(entrySpeed),
-		timeSinceLastCreep_(0) {};
+		timeSinceLastCreep_(0),
+		creepsLeakedSinceLastUpdate_(0) {};
 	const std::vector<Creep>& getActiveCreeps();
 	void update();
 	void draw(sf::RenderWindow&);
+	int getCreepsLeakedSinceLastUpdate();
 	bool isDefeated();
 
 private:
@@ -27,6 +30,7 @@ private:
 	std::vector<Creep> activeCreeps_;
 	double entrySpeed_;
 	double timeSinceLastCreep_;
+	int creepsLeakedSinceLastUpdate_;
 };
 
 #endif
