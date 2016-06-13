@@ -18,6 +18,7 @@ public:
 	void setFuturePosition(double timeDelta,float& x,float& y);
 	float getXPosition();
 	float getYPosition();
+	bool isLeaked();
 	void update();
 	std::string getId();
 	void draw(sf::RenderWindow&);
@@ -28,6 +29,7 @@ private:
 	int hp_;
 	double speed_;//represented as a fraction of a tile per second
 	std::string id_;
+	bool leaked_;
 };
 
 #endif

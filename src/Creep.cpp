@@ -18,10 +18,15 @@ Creep::Creep(int spawn, int hp, double speed, std::string id) {//tilesize ->draw
 	hp_ = hp;
 	id_ = id;
 	comingFrom_ = spawn;
+	leaked_ = false;
 }
 
 std::string Creep::getId() {
 	return id_;
+}
+
+bool Creep:isLeaked() {
+	return leaked;
 }
 
 void Creep::getFuturePosition(double timeDelta, float& x, float& y) {
@@ -69,6 +74,9 @@ void Creep::getFuturePosition(double timeDelta, float& x, float& y) {
 				y -= distanceDelta;
 				distanceDelta = 0;
 			}
+		}else if (comingFrom_ == goingTo) {
+			distanceDelta = 0;
+			isLeaked_ = true;
 		}
 	}
 }
