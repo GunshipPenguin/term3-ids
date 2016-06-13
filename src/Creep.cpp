@@ -25,45 +25,45 @@ std::string Creep::getId() {
 }
 
 void Creep::getFuturePosition(double timeDelta, float& x, float& y) {
-	int tileSize = TileSet::getDrawnSize();
-	float distanceDelta(timeDelta*speed_);
+	int drawnSize = TileSet::getDrawnSize();
+	float distanceDelta(timeDelta*speed_*drawnSize);
 	while (distanceDelta > 0) {
 		int goingTo = paths_.getNextByID(comingFrom_);
 		if (comingFrom_ == goingTo-1) { //coming from left of goingTo
-			float distanceIntoTile = x - (comingFrom_)*tileSize;
-			if (distanceDelta >= tileSize - distanceIntoTile) {
-				distanceDelta -= (tileSize-distanceIntoTile);
-				x = (goingTo%paths_.getNumTilesX())*tileSize;
+			float distanceIntoTile = x - (comingFrom_%paths_.getNumTilesX())*drawnSize;
+			if (distanceDelta >= drawnSize - distanceIntoTile) {
+				distanceDelta -= (drawnSize-distanceIntoTile);
+				x = (goingTo%paths_.getNumTilesX())*drawnSize;
 				comingFrom_ = goingTo;
 			}else {
 				x += distanceDelta;
 				distanceDelta = 0;
 			}
 		}else if (comingFrom_ == goingTo+1) { //coming from right of goingTo
-			float distanceIntoTile = (comingFrom_)*tileSize -x;
-			if (distanceDelta >= tileSize - distanceIntoTile) {
-				distanceDelta -= (tileSize - distanceIntoTile);
-				x = (goingTo%paths_.getNumTilesX())*tileSize;
+			float distanceIntoTile = (comingFrom_%paths_.getNumTilesX())*drawnSize -x;
+			if (distanceDelta >= drawnSize - distanceIntoTile) {
+				distanceDelta -= (drawnSize - distanceIntoTile);
+				x = (goingTo%paths_.getNumTilesX())*drawnSize;
 				comingFrom_ = goingTo;
 			}else {
 				x -= distanceDelta;
 				distanceDelta = 0;
 			}
 		}else if (comingFrom_ == goingTo-paths_.getNumTilesX()) {//coming from above goingTo
-			float distanceIntoTile = y - comingFrom_/paths_.getNumTilesX() * tileSize;
-			if (distanceDelta >= tileSize - distanceIntoTile) {
-				distanceDelta -= (tileSize - distanceIntoTile);
-				y = (goingTo/paths_.getNumTilesX()) * tileSize;
+			float distanceIntoTile = y - comingFrom_/paths_.getNumTilesX() * drawnSize;
+			if (distanceDelta >= drawnSize - distanceIntoTile) {
+				distanceDelta -= (drawnSize - distanceIntoTile);
+				y = (goingTo/paths_.getNumTilesX()) * drawnSize;
 				comingFrom_ = goingTo;
 			}else {
 				y += distanceDelta;
 				distanceDelta = 0;
 			}
 		}else if (comingFrom_ == goingTo+paths_.getNumTilesX()) {//coming from below goingTo
-			float distanceIntoTile = comingFrom_/paths_.getNumTilesX() * tileSize -y;
-			if (distanceDelta >= tileSize - distanceIntoTile) {
-				distanceDelta -= (tileSize - distanceIntoTile);
-				y = (goingTo/paths_.getNumTilesX()) * tileSize;
+			float distanceIntoTile = comingFrom_/paths_.getNumTilesX() * drawnSize -y;
+			if (distanceDelta >= drawnSize - distanceIntoTile) {
+				distanceDelta -= (drawnSize - distanceIntoTile);
+				y = (goingTo/paths_.getNumTilesX()) * drawnSize;
 				comingFrom_ = goingTo;
 			}else {
 				y -= distanceDelta;

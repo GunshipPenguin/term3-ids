@@ -3,7 +3,7 @@
 		name="Sheep"
 		id="1"
 		hp="10"
-		speed="100"
+		speed="1"
 		tileSize="16"
 		texture="sheep.png"/>
 </creeps>
