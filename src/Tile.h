@@ -2,10 +2,11 @@
 #define TILE_H
 
 #include <SFML/Graphics.hpp>
-#include "Drawable.h"
+
+#include "TileDrawable.h"
 #include "TileSet.h"
 
-class Tile : public Drawable {
+class Tile : public TileDrawable {
 public:
 	void setId(int);
 	void setCreepExit(bool);

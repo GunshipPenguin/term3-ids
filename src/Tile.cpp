@@ -1,7 +1,7 @@
 #include "Tile.h"
-#include "Drawable.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "TileDrawable.h"
 
 void Tile::setId(int id) {
 	id_ = id;
@@ -11,7 +11,7 @@ void Tile::setId(int id) {
 void Tile::draw(sf::RenderWindow &window) {
 	if(tileSet_) {
 		sf::Sprite sprite = tileSet_->getSpriteById(id_);
-		sprite.setPosition(x_, y_);
+		sprite.setPosition(getPosition());
 		window.draw(sprite);
 	}
 	return;

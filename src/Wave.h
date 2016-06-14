@@ -3,10 +3,10 @@
 
 #include <vector>
 #include "Updateable.h"
-#include "Drawable.h"
 #include "Creep.h"
+#include "TileDrawable.h"
 
-class Wave: public Updateable, public Drawable {
+class Wave: public Updateable, public TileDrawable {
 public:
 	Wave() :
 		waitingCreeps_(std::vector<Creep>()),

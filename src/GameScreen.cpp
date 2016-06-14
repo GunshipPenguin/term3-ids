@@ -3,6 +3,7 @@
 #include "Tile.h"
 #include "TileMap.h"
 #include "TileSet.h"
+#include "TileDrawable.h"
 #include "Wave.h"
 #include "Creep.h"
 #include "CreepPathfinder.h"

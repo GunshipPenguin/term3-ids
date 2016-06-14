@@ -21,12 +21,11 @@ void TileMap::setNumTilesX(int numTilesX) {
 
 void TileMap::layoutTiles(int tileSize) {
 	// Set tile positions
-	sf::Vector2f position;
 	int x, y;
 	for (size_t i=0;i<tiles_.size();i++) {
 		x = (i % numTilesX_) * TileSet::getDrawnSize();
 		y = (i / numTilesX_) * TileSet::getDrawnSize();
-		tiles_.at(i).setPosition(x, y);
+		tiles_.at(i).setPosition(sf::Vector2f(x, y));
 	}
 	return;
 }

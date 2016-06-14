@@ -1,4 +1,3 @@
-#include "Drawable.h"
 #include "Updateable.h"
 #include "Tile.h"
 #include "Creep.h"
@@ -6,14 +5,16 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 #include "CreepPathfinder.h"
+#include "TileDrawable.h"
 
 CreepPathfinder Creep::paths_;
 
 Creep::Creep() {}
 
 Creep::Creep(int spawn, int hp, double speed, std::string id) {//tilesize ->drawnTileSize
-	x_ = (spawn%paths_.getNumTilesX())*TileSet::getDrawnSize();//tileSize;
-	y_ = (spawn/paths_.getNumTilesX())*TileSet::getDrawnSize();//tileSize;
+	int xPos = (spawn%paths_.getNumTilesX())*TileSet::getDrawnSize();
+	int yPos = (spawn/paths_.getNumTilesX())*TileSet::getDrawnSize();
+	setPosition(sf::Vector2f(xPos, yPos));
 	speed_ = speed;
 	hp_ = hp;
 	id_ = id;
@@ -29,49 +30,51 @@ bool Creep::isLeaked() {
 	return leaked_;
 }
 
-void Creep::getFuturePosition(double timeDelta, float& x, float& y) {
+sf::Vector2f Creep::getFuturePosition(double timeDelta) {
 	int drawnSize = TileSet::getDrawnSize();
+	sf::Vector2f pos = getPosition();
 	float distanceDelta(timeDelta*speed_*drawnSize);
+
 	while (distanceDelta > 0) {
 		int goingTo = paths_.getNextByID(comingFrom_);
 		if (comingFrom_ == goingTo-1) { //coming from left of goingTo
-			float distanceIntoTile = x - (comingFrom_%paths_.getNumTilesX())*drawnSize;
+			float distanceIntoTile = pos.x - (comingFrom_%paths_.getNumTilesX())*drawnSize;
 			if (distanceDelta >= drawnSize - distanceIntoTile) {
 				distanceDelta -= (drawnSize-distanceIntoTile);
-				x = (goingTo%paths_.getNumTilesX())*drawnSize;
+				pos.x = (goingTo%paths_.getNumTilesX())*drawnSize;
 				comingFrom_ = goingTo;
 			}else {
-				x += distanceDelta;
+				pos.x += distanceDelta;
 				distanceDelta = 0;
 			}
 		}else if (comingFrom_ == goingTo+1) { //coming from right of goingTo
-			float distanceIntoTile = (comingFrom_%paths_.getNumTilesX())*drawnSize -x;
+			float distanceIntoTile = (comingFrom_%paths_.getNumTilesX())*drawnSize - pos.x;
 			if (distanceDelta >= drawnSize - distanceIntoTile) {
 				distanceDelta -= (drawnSize - distanceIntoTile);
-				x = (goingTo%paths_.getNumTilesX())*drawnSize;
+				pos.x = (goingTo%paths_.getNumTilesX())*drawnSize;
 				comingFrom_ = goingTo;
 			}else {
-				x -= distanceDelta;
+				pos.x -= distanceDelta;
 				distanceDelta = 0;
 			}
 		}else if (comingFrom_ == goingTo-paths_.getNumTilesX()) {//coming from above goingTo
-			float distanceIntoTile = y - comingFrom_/paths_.getNumTilesX() * drawnSize;
+			float distanceIntoTile = pos.y - comingFrom_/paths_.getNumTilesX() * drawnSize;
 			if (distanceDelta >= drawnSize - distanceIntoTile) {
 				distanceDelta -= (drawnSize - distanceIntoTile);
-				y = (goingTo/paths_.getNumTilesX()) * drawnSize;
+				pos.y = (goingTo/paths_.getNumTilesX()) * drawnSize;
 				comingFrom_ = goingTo;
 			}else {
-				y += distanceDelta;
+				pos.y += distanceDelta;
 				distanceDelta = 0;
 			}
 		}else if (comingFrom_ == goingTo+paths_.getNumTilesX()) {//coming from below goingTo
-			float distanceIntoTile = comingFrom_/paths_.getNumTilesX() * drawnSize -y;
+			float distanceIntoTile = comingFrom_/paths_.getNumTilesX() * drawnSize - pos.y;
 			if (distanceDelta >= drawnSize - distanceIntoTile) {
 				distanceDelta -= (drawnSize - distanceIntoTile);
-				y = (goingTo/paths_.getNumTilesX()) * drawnSize;
+				pos.y = (goingTo/paths_.getNumTilesX()) * drawnSize;
 				comingFrom_ = goingTo;
 			}else {
-				y -= distanceDelta;
+				pos.y -= distanceDelta;
 				distanceDelta = 0;
 			}
 		}else if (comingFrom_ == goingTo) {
@@ -79,24 +82,13 @@ void Creep::getFuturePosition(double timeDelta, float& x, float& y) {
 			leaked_ = true;
 		}
 	}
-}
-
-void Creep::setFuturePosition(double timeDelta, float& x, float& y) {
-	getFuturePosition(timeDelta,x,y);
-}
-
-float Creep::getXPosition() {
-	return x_;
-}
-
-float Creep::getYPosition() {
-	return y_;
+	return pos;
 }
 
 void Creep::draw(sf::RenderWindow &window) {
 	if (tileSet_) {
 		sf::Sprite creepSprite = tileSet_->getSpriteById(1);
-		creepSprite.setPosition(x_,y_);
+		creepSprite.setPosition(getPosition());
 
 		window.draw(creepSprite);
 	}
@@ -104,7 +96,7 @@ void Creep::draw(sf::RenderWindow &window) {
 }
 
 void Creep::update() {
-	setFuturePosition(delta_,x_,y_);
+	setPosition(getFuturePosition(delta_));
 	return;
 }
 

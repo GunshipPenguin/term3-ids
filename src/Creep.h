@@ -1,7 +1,6 @@
 #ifndef CREEP_H
 #define CREEP_H
 
-#include "Drawable.h"
 #include "Updateable.h"
 #include "Tile.h"
 #include <vector>
@@ -9,13 +8,13 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "CreepPathfinder.h"
+#include "TileDrawable.h"
 
-class Creep: public Updateable, public Drawable {
+class Creep: public Updateable, public TileDrawable {
 public:
 	Creep();
 	Creep(int,int,double,std::string);
-	void getFuturePosition(double timeDelta, float& x, float& y);
-	void setFuturePosition(double timeDelta,float& x,float& y);
+	sf::Vector2f getFuturePosition(double timeDelta);
 	float getXPosition();
 	float getYPosition();
 	bool isLeaked();
