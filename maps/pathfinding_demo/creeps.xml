@@ -1,0 +1,9 @@
+<creeps>
+	<creep
+		name="Sheep"
+		id="1"
+		hp="10"
+		speed="6"
+		tileSize="16"
+		texture="sheep.png"/>
+</creeps>
