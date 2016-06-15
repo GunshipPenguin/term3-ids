@@ -10,3 +10,7 @@ void Updateable::updateDelta() {
 	delta_ = tempTime-totalTime_;
 	totalTime_=tempTime;
 }
+
+double Updateable::getDelta() {
+	return delta_;
+}

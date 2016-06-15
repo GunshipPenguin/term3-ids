@@ -6,8 +6,9 @@
 class Updateable {
 public:
 	static void updateDelta();
+	static double getDelta();
 	virtual void update() = 0;
-protected:
+private:
 	static sf::Clock clock_;
 	static double delta_;
 	static double totalTime_;

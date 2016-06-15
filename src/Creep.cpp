@@ -96,7 +96,7 @@ void Creep::draw(sf::RenderWindow &window) {
 }
 
 void Creep::update() {
-	setPosition(getFuturePosition(delta_));
+	setPosition(getFuturePosition(getDelta()));
 	return;
 }
 
