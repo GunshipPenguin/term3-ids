@@ -4,12 +4,16 @@
 #include "TileDrawable.h"
 #include "Updateable.h"
 #include "Projectile.h"
+#include "TileMap.h"
 
 class Tower : public TileDrawable, public Updateable {
 public:
-	Tower(double damage, double fireRate, TileMap* tileMap) :
+	Tower(std::string id, std::string name, int cost, double damage,
+			double fireRate, double projectileSpeed, const TileMap* tileMap) :
+		id_(id),
+		name_(name),
 		damage_(damage),
-		fireRate_(fireRate)_,
+		fireRate_(fireRate),
 		tileMap_(tileMap) {};
 	void draw(sf::RenderWindow&);
 	void update();
@@ -17,9 +21,15 @@ public:
 	void setTileMap(const TileMap*& tileMap);
 
 private:
+	std::string id_;
+	std::string name_;
+
 	double damage_;
 	double fireRate_;
-	TileMap* tileMap_;
+	double projectileSpeed;
+	double range_;
+	int cost_;
+	const TileMap* tileMap_;
 
 	float currRotation_;
 };

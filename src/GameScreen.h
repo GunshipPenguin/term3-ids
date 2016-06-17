@@ -3,6 +3,7 @@
 
 #include "Screen.h"
 #include "Tile.h"
+#include "Tower.h"
 #include "Creep.h"
 #include "TileMap.h"
 #include "Wave.h"
@@ -29,11 +30,13 @@ public:
 	static const int TILEMAP_LOAD_ERROR = 1;
 	static const int CREEP_LOAD_ERROR = 2;
 	static const int WAVE_LOAD_ERROR = 3;
+	static const int TOWER_LOAD_ERROR = 4;
 
 private:
 	bool loadCreeps();
 	bool loadTileMap();
 	bool loadWaves();
+	bool loadTowers();
 	void nextWave();
 	sf::View getMenuView(int, int);
 	sf::View getMapView(int, int);
@@ -51,6 +54,9 @@ private:
 
 	std::map<std::string, Creep> loadedCreeps_;
 	std::map<std::string, TileSet> creepTileSets_;
+
+	std::map<std::string, Tower> loadedTowers_;
+	std::map<std::string, TileSet> towerTileSets_;
 
 	int lives_;
 };

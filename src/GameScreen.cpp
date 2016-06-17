@@ -34,6 +34,12 @@ int GameScreen::run(sf::RenderWindow &window) {
 		return CREEP_LOAD_ERROR;
 	}
 
+	// Load Towers
+	if (! loadTowers()) {
+		Logger::log("GameScreen could not load towers");
+		return TOWER_LOAD_ERROR;
+	}
+
 	// Load Waves
 	if (! loadWaves()) {
 		Logger::log("Waves could not be loaded");
@@ -278,6 +284,124 @@ bool GameScreen::loadCreeps() {
 		loadedCreeps_.insert(std::pair<std::string, Creep> (creepId, creep));
 
 		currCreepElement = currCreepElement->NextSiblingElement();
+	}
+	return true;
+}
+
+bool GameScreen::loadTowers() {
+	// Load XML document
+	tinyxml2::XMLDocument doc;
+	std::string towersFilePath = mapPath_ + "/towers.xml";
+	if(doc.LoadFile(towersFilePath.c_str()) != tinyxml2::XML_NO_ERROR) {
+		Logger::log("Could not load towers.xml");
+		return false;
+	}
+
+	// Get towers element
+	tinyxml2::XMLElement* towersElement = doc.FirstChildElement("towers");
+	tinyxml2::XMLElement* currTowerElement = towersElement->FirstChildElement();
+
+	// Loop through and load all creeps
+	while(true) {
+		if (currTowerElement == 0) {
+			break;
+		}
+
+		// Get tower id
+		const char* towerIdCharArray;
+		towerIdCharArray = currTowerElement->Attribute("id");
+		if (! towerIdCharArray) {
+			Logger::log("Tower id does not exist in towers.xml");
+			return false;
+		}
+		std::string towerId(towerIdCharArray);
+		if(towerId.empty()) {
+			Logger::log("Empty tower id in towers.xml");
+			return false;
+		}
+
+		// Load tower name
+		const char* towerNameCharArray;
+		towerNameCharArray = currTowerElement->Attribute("name");
+		if (! towerNameCharArray) {
+			Logger::log("Tower name does not exist in towers.xml");
+			return false;
+		}
+		std::string towerName(towerNameCharArray);
+		if(towerName.empty()) {
+			Logger::log("Empty tower name in towers.xml");
+			return false;
+		}
+
+
+		// Load tower damage
+		double towerDamage;
+		if (currTowerElement->QueryDoubleAttribute("damage", &towerDamage) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not load tower damage in towers.xml");
+			return false;
+		}
+
+		// Load tower range
+		int towerRange;
+		if (currTowerElement->QueryIntAttribute("range", &towerRange) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not load tower range in towers.xml");
+			return false;
+		}
+
+		// Load tower fire rate
+		double towerFireRate;
+		if (currTowerElement->QueryDoubleAttribute("fireRate", &towerFireRate) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not load tower texture in towers.xml");
+			return false;
+		}
+
+		// Load tower projectile speed
+		double towerProjectileSpeed;
+		if (currTowerElement->QueryDoubleAttribute("projectileSpeed", &towerProjectileSpeed) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not load tower projectile speed in towers.xml");
+			return false;
+		}
+
+		// Load tower cost
+		int towerCost;
+		if (currTowerElement->QueryIntAttribute("cost", &towerCost) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not load tower cost in towers.xml");
+			return false;
+		}
+
+		// Get tower tileSize
+		int towerTileSize;
+		if(currTowerElement->QueryIntAttribute("tileSize", &towerTileSize) != tinyxml2::XML_NO_ERROR) {
+			Logger::log("Could not find tileSize of tower in towers.xml");
+			return false;
+		}
+
+		// Load tower texture filename
+		const char* towerTextureFileNameCharArray;
+		towerTextureFileNameCharArray = currTowerElement->Attribute("texture");
+		if (! towerTextureFileNameCharArray) {
+			Logger::log("Tower texture does not exist in towers.xml");
+			return false;
+		}
+		std::string towerTextureFileName(towerTextureFileNameCharArray);
+
+		// Load tower texture
+		sf::Texture towerTexture;
+		std::string textureDir = mapPath_ + "/res/" + towerTextureFileName;
+		if (!towerTexture.loadFromFile(textureDir)) {
+			Logger::log("Could not load tower texture in towers.xml");
+			return false;
+		}
+
+		TileSet towerTileSet = TileSet(towerTexture, towerTileSize);
+		towerTileSets_[towerId] = towerTileSet;
+
+		Tower tower = Tower(towerId, towerName, towerCost, towerDamage,
+				towerFireRate, towerProjectileSpeed, &tileMap_);
+		tower.setTileSet(&towerTileSets_[towerId]);
+		loadedTowers_.insert(std::pair<std::string, Tower> (towerId, tower));
+
+		currTowerElement = currTowerElement->NextSiblingElement();
 	}
 	return true;
 }

@@ -1,19 +1,25 @@
 <towers>
 	<tower
+		id="tower_arrow"
 		name="Arrow Tower"
 		damage="2"
 		range="12"
-		fire_rate="0.25"
+		fireRate="0.5"
+		projectileSpeed="3"
 		cost="10"
-		img="arrow_tower.png" />
-		
+		tileSize="16"
+		texture="arrow_tower.png" />
+<!--		
 	<tower
+		id="tower_cannon"
 		name="Cannon"
 		damage="5"
 		range="10"
-		fire_rate="1"
+		fireRate="1"
+		projectileSpeed="2"
 		cost="20"
-		img="tower_images/cannon.png">
+		tileSize="16"
+		texture="cannon.png">
 		<upgrade
 			name="More damage"
 			descrip="Damage increased slightly"
@@ -22,16 +28,20 @@
 	</tower>
 		
 	<tower
+		id="tower_rocket"
 		name="Rocket"
 		damage="30"
 		range="20"
-		fire_rate="2.5"
+		fireRate="2.5"
+		projectileSpeed="3"
 		cost="50"
-		img="tower_images/rocket.png">
+		tileSize="16"
+		texture="rocket.png">
 		<upgrade
 			name="Extra Range"
 			descrip="Same fire rate, but double the range"
 			cost="75" 
 			range_upgrade="20"/>
 	</tower>
+-->
 </towers>

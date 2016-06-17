@@ -1,7 +1,7 @@
 #ifndef PROJECTILE_H
 #define PROJECTILE_H
 
-#include "Drawable.h"
+#include "TileDrawable.h"
 #include "Updateable.h"
 #include "Collideable.h"
 #include <SFML/Graphics.hpp>
