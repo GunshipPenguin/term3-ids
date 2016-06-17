@@ -30,6 +30,30 @@ bool Creep::isLeaked() {
 	return leaked_;
 }
 
+bool Creep::isAbove(int first, int second) {
+	if (first == second - paths_.getNumTilesX())
+		return true;
+	return false;
+}
+
+bool Creep::isBelow(int first, int second) {
+	if (first == second + paths_.getNumTilesX())
+		return true;
+	return false;
+}
+
+bool Creep::isLeft(int first, int second) {
+	if (first == second - 1)
+		return true;
+	return false;
+}
+
+bool Creep::isRight(int first, int second) {
+	if (first == second + 1)
+		return true;
+	return false;
+}
+
 sf::Vector2f Creep::getFuturePosition(double timeDelta) {
 	int drawnSize = TileSet::getDrawnSize();
 	sf::Vector2f pos = getPosition();
@@ -37,7 +61,7 @@ sf::Vector2f Creep::getFuturePosition(double timeDelta) {
 
 	while (distanceDelta > 0) {
 		int goingTo = paths_.getNextByID(comingFrom_);
-		if (comingFrom_ == goingTo-1) { //coming from left of goingTo
+		if (isLeft(comingFrom_,goingTo)) { //coming from left of goingTo
 			float distanceIntoTile = pos.x - (comingFrom_%paths_.getNumTilesX())*drawnSize;
 			if (distanceDelta >= drawnSize - distanceIntoTile) {
 				distanceDelta -= (drawnSize-distanceIntoTile);
@@ -47,7 +71,7 @@ sf::Vector2f Creep::getFuturePosition(double timeDelta) {
 				pos.x += distanceDelta;
 				distanceDelta = 0;
 			}
-		}else if (comingFrom_ == goingTo+1) { //coming from right of goingTo
+		}else if (isRight(comingFrom_,goingTo)) { //coming from right of goingTo
 			float distanceIntoTile = (comingFrom_%paths_.getNumTilesX())*drawnSize - pos.x;
 			if (distanceDelta >= drawnSize - distanceIntoTile) {
 				distanceDelta -= (drawnSize - distanceIntoTile);
@@ -57,7 +81,7 @@ sf::Vector2f Creep::getFuturePosition(double timeDelta) {
 				pos.x -= distanceDelta;
 				distanceDelta = 0;
 			}
-		}else if (comingFrom_ == goingTo-paths_.getNumTilesX()) {//coming from above goingTo
+		}else if (isAbove(comingFrom_,goingTo)) {//coming from above goingTo
 			float distanceIntoTile = pos.y - comingFrom_/paths_.getNumTilesX() * drawnSize;
 			if (distanceDelta >= drawnSize - distanceIntoTile) {
 				distanceDelta -= (drawnSize - distanceIntoTile);
@@ -67,7 +91,7 @@ sf::Vector2f Creep::getFuturePosition(double timeDelta) {
 				pos.y += distanceDelta;
 				distanceDelta = 0;
 			}
-		}else if (comingFrom_ == goingTo+paths_.getNumTilesX()) {//coming from below goingTo
+		}else if (isBelow(comingFrom_,goingTo)) {//coming from below goingTo
 			float distanceIntoTile = comingFrom_/paths_.getNumTilesX() * drawnSize - pos.y;
 			if (distanceDelta >= drawnSize - distanceIntoTile) {
 				distanceDelta -= (drawnSize - distanceIntoTile);
@@ -88,8 +112,25 @@ sf::Vector2f Creep::getFuturePosition(double timeDelta) {
 void Creep::draw(sf::RenderWindow &window) {
 	if (tileSet_) {
 		sf::Sprite creepSprite = tileSet_->getSpriteById(1);
-		creepSprite.setPosition(getPosition());
-
+		sf::Vector2f position = getPosition();
+		int drawnSize = TileSet::getDrawnSize();
+		creepSprite.setOrigin(drawnSize/2.f,drawnSize/2.f);
+		position.x += drawnSize/2.f;
+		position.y += drawnSize/2.f;
+		creepSprite.setPosition(position);
+		
+		int goingTo = paths_.getNextByID(comingFrom_);
+		
+		if (isAbove(comingFrom_,goingTo)) {
+			creepSprite.setRotation(180);
+		}else if (isBelow(comingFrom_,goingTo)) {
+			creepSprite.setRotation(0);
+		}else if (isLeft(comingFrom_,goingTo)) {
+			creepSprite.setRotation(90);
+		}else if (isRight(comingFrom_,goingTo)) {
+			creepSprite.setRotation(270);
+		}
+		
 		window.draw(creepSprite);
 	}
 	return;

@@ -23,6 +23,10 @@ public:
 	void draw(sf::RenderWindow&);
 	static void setCreepPathfinder(CreepPathfinder&);
 private:
+	bool isAbove(int,int);
+	bool isBelow(int,int);
+	bool isLeft(int,int);
+	bool isRight(int,int);
 	static CreepPathfinder paths_;
 	int comingFrom_;
 	int hp_;
