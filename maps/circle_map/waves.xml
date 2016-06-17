@@ -1,6 +1,9 @@
 <waves>
 	<wave
 		entrySpeed="1">
-		1,1,1,1
+		sheep,
+		sheep,
+		sheep,
+		sheep,
 	</wave>
 </waves>

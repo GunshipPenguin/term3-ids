@@ -1,7 +1,7 @@
 <creeps>
 	<creep
 		name="Sheep"
-		id="1"
+		id="sheep"
 		hp="10"
 		speed="1"
 		tileSize="16"

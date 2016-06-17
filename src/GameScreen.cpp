@@ -236,10 +236,16 @@ bool GameScreen::loadCreeps() {
 		}
 
 		// Get creep id
-		std::string creepId;
-		creepId = currCreepElement->Attribute("id");
+		const char* creepIdCharArray;
+		creepIdCharArray = currCreepElement->Attribute("id");
+		if (! creepIdCharArray) {
+			Logger::log("Creep id does not exist in creeps.xml");
+			return false;
+		}
+		std::string creepId(creepIdCharArray);
 		if(creepId.empty()) {
-			Logger::log("Invalid or missing id of creep in creeps.xml");
+			Logger::log("Empty creep id in creeps.xml");
+			return false;
 		}
 
 		// Get creep speed
@@ -262,9 +268,17 @@ bool GameScreen::loadCreeps() {
 			return false;
 		}
 
+		// Get creep texture file name
+		const char* creepTextureFileNameCharArray = currCreepElement->Attribute("texture");;
+		if (! creepTextureFileNameCharArray) {
+			Logger::log("Creep texture file name does not exist in creeps.xml");
+			return false;
+		}
+		std::string creepTextureFileName(creepTextureFileNameCharArray);
+
 		// Load creep texture
 		sf::Texture creepTexture;
-		std::string textureDir = mapPath_ + "/res/" + currCreepElement->Attribute("texture");
+		std::string textureDir = mapPath_ + "/res/" + creepTextureFileName;
 		if (!creepTexture.loadFromFile(textureDir)) {
 			Logger::log("Could not load creep texture in creeps.xml");
 			return false;
