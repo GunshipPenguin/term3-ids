@@ -6,7 +6,7 @@
 #include "Creep.h"
 #include "TileDrawable.h"
 
-class Wave: public Updateable, public TileDrawable {
+class Wave: public Updateable, public Drawable {
 public:
 	Wave() :
 		waitingCreeps_(std::vector<Creep>()),

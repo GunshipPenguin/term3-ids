@@ -5,7 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include "Tile.h"
 
-class TileMap: public TileDrawable {
+class TileMap: public Drawable {
 public:
 	TileMap() :
 		tiles_(std::vector<Tile>()),
