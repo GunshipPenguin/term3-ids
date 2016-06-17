@@ -4,7 +4,7 @@
 
 	<tile_set
 		size="16"
-		creep_walkable="12,11"
+		creep_walkable="12,11,23"
 		buildable="12"
 		src="tiles.png" />
 
