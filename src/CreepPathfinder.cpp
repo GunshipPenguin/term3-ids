@@ -24,7 +24,6 @@ void CreepPathfinder::updatePaths() {
 		currTile = q.front();
 		q.pop();
 		if (!tileMap.at(currTile).isBuilt() and tileMap.at(currTile).isCreepWalkable()) {
-			
 			if (getYById(currTile,numTilesX) != 0 and positions.at(currTile-numTilesX) == -1) {
 				q.push(currTile-numTilesX);
 				positions[currTile-numTilesX] = currTile;
