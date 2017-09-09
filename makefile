@@ -13,7 +13,7 @@ all: binary
 
 binary: make_build_dir $(OBJS)
 	mkdir -p $(BIN_DIR)
-	$(CC) $(LFLAGS) $(BUILD_DIR)/*.o -o $(BIN_DIR)/$(BIN_NAME)
+	$(CC) $(BUILD_DIR)/*.o -o $(BIN_DIR)/$(BIN_NAME) $(LFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) $(CFLAGS) -o $@ $<
